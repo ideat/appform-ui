@@ -1,0 +1,266 @@
+[
+  {
+    "values": "",
+    "visible": true,
+    "position": 0,
+    "required": true,
+    "componentName": "fieldText1",
+    "componentLabel": "Etiqueta"
+  },
+  {
+    "values": "",
+    "visible": false,
+    "position": 0,
+    "required": false,
+    "componentName": "fieldText2",
+    "componentLabel": "Etiqueta"
+  },
+  {
+    "values": "",
+    "visible": false,
+    "position": 0,
+    "required": false,
+    "componentName": "fieldText3",
+    "componentLabel": "Etiqueta"
+  },
+  {
+    "values": "",
+    "visible": false,
+    "position": 0,
+    "required": false,
+    "componentName": "fieldText4",
+    "componentLabel": "Etiqueta"
+  },
+  {
+    "values": "",
+    "visible": false,
+    "position": 0,
+    "required": false,
+    "componentName": "fieldText5",
+    "componentLabel": "Etiqueta"
+  },
+  {
+    "values": "",
+    "visible": false,
+    "position": 0,
+    "required": false,
+    "componentName": "fieldText6",
+    "componentLabel": "Etiqueta"
+  },
+  {
+    "values": "",
+    "visible": false,
+    "position": 0,
+    "required": false,
+    "componentName": "fieldText7",
+    "componentLabel": "Etiqueta"
+  },
+  {
+    "values": "",
+    "visible": false,
+    "position": 0,
+    "required": false,
+    "componentName": "fieldText8",
+    "componentLabel": "Etiqueta"
+  },
+  {
+    "values": "",
+    "visible": false,
+    "position": 0,
+    "required": false,
+    "componentName": "fieldText9",
+    "componentLabel": "Etiqueta"
+  },
+  {
+    "values": "",
+    "visible": false,
+    "position": 0,
+    "required": false,
+    "componentName": "fieldText10",
+    "componentLabel": "Etiqueta"
+  },
+  {
+    "values": "",
+    "visible": false,
+    "position": 0,
+    "required": false,
+    "componentName": "fieldText11",
+    "componentLabel": "Etiqueta"
+  },
+  {
+    "values": "",
+    "visible": false,
+    "position": 0,
+    "required": false,
+    "componentName": "fieldText12",
+    "componentLabel": "Etiqueta"
+  },
+  {
+    "values": "",
+    "visible": false,
+    "position": 0,
+    "required": false,
+    "componentName": "fieldText13",
+    "componentLabel": "Etiqueta"
+  },
+  {
+    "values": "",
+    "visible": false,
+    "position": 0,
+    "required": false,
+    "componentName": "fieldText14",
+    "componentLabel": "Etiqueta"
+  },
+  {
+    "values": "",
+    "visible": false,
+    "position": 0,
+    "required": false,
+    "componentName": "fieldText15",
+    "componentLabel": "Etiqueta"
+  },
+  {
+    "values": "",
+    "visible": false,
+    "position": 0,
+    "required": false,
+    "componentName": "fieldText16",
+    "componentLabel": "Etiqueta"
+  },
+  {
+    "values": null,
+    "visible": false,
+    "position": 0,
+    "required": false,
+    "componentName": "fieldSelection1",
+    "componentLabel": "Etiqueta"
+  },
+  {
+    "values": "",
+    "visible": false,
+    "position": 0,
+    "required": false,
+    "componentName": "fieldSelection2",
+    "componentLabel": "Etiqueta"
+  },
+  {
+    "values": "",
+    "visible": false,
+    "position": 0,
+    "required": false,
+    "componentName": "fieldSelection3",
+    "componentLabel": "Etiqueta"
+  },
+  {
+    "values": null,
+    "visible": false,
+    "position": 0,
+    "required": false,
+    "componentName": "fieldInteger1",
+    "componentLabel": "Etiqueta"
+  },
+  {
+    "values": null,
+    "visible": false,
+    "position": 0,
+    "required": false,
+    "componentName": "fieldInteger2",
+    "componentLabel": "Etiqueta"
+  },
+  {
+    "values": "",
+    "visible": false,
+    "position": 0,
+    "required": false,
+    "componentName": "fieldBoolean1",
+    "componentLabel": "Etiqueta"
+  },
+  {
+    "values": "",
+    "visible": false,
+    "position": 0,
+    "required": false,
+    "componentName": "fieldBoolean2",
+    "componentLabel": "Etiqueta"
+  },
+  {
+    "values": "",
+    "visible": false,
+    "position": 0,
+    "required": false,
+    "componentName": "fieldBoolean3",
+    "componentLabel": "Etiqueta"
+  },
+  {
+    "values": "",
+    "visible": true,
+    "position": 0,
+    "required": true,
+    "componentName": "fieldDouble1",
+    "componentLabel": "Monto"
+  },
+  {
+    "values": "",
+    "visible": false,
+    "position": 0,
+    "required": false,
+    "componentName": "fieldDouble2",
+    "componentLabel": "Etiqueta"
+  },
+  {
+    "values": "",
+    "visible": false,
+    "position": 0,
+    "required": false,
+    "componentName": "fieldDouble3",
+    "componentLabel": "Etiqueta"
+  },
+  {
+    "values": "",
+    "visible": false,
+    "position": 0,
+    "required": false,
+    "componentName": "fieldDouble4",
+    "componentLabel": "Etiqueta"
+  },
+  {
+    "values": "",
+    "visible": false,
+    "position": 0,
+    "required": false,
+    "componentName": "fieldDouble5",
+    "componentLabel": "Etiqueta"
+  },
+  {
+    "values": "",
+    "visible": false,
+    "position": 0,
+    "required": false,
+    "componentName": "fieldDate1",
+    "componentLabel": "Etiqueta"
+  },
+  {
+    "values": "",
+    "visible": false,
+    "position": 0,
+    "required": false,
+    "componentName": "fieldDate2",
+    "componentLabel": "Etiqueta"
+  },
+  {
+    "values": "",
+    "visible": false,
+    "position": 0,
+    "required": false,
+    "componentName": "fieldDate3",
+    "componentLabel": "Etiqueta"
+  },
+  {
+    "values": "",
+    "visible": false,
+    "position": 0,
+    "required": false,
+    "componentName": "fieldDate4",
+    "componentLabel": "Etiqueta"
+  }
+]
