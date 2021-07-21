@@ -69,19 +69,13 @@ public class DataFormDto {
 
     private String city;
 
-//    public String getExtension(){
-//        String ex="";
-//        if(typeDocument.trim().equals("CARNET DE IDENTIDAD")){
-//            ex = this.idCard.substring(idCard.trim().length()-2, idCard.trim().length());
-//        }
-//        return ex;
-//    }
-//
-//    public String getNumberIdCard(){
-//        String number="";
-//        if(typeDocument.trim().equals("CARNET DE IDENTIDAD")){
-//            number = this.idCard.substring(0,idCard.trim().length()-2);
-//        }
-//        return number;
-//    }
+    private String email;
+
+    private String user;
+
+    private String officeUser;
+
+    private String fullNameClient;
+
+    private String account;
 }

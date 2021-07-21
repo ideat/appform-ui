@@ -77,7 +77,7 @@ public class NaviDrawer extends Div
 	}
 
 	private void initHeader() {
-		mainContent.add(new BrandExpression("Appform UI"));
+		mainContent.add(new BrandExpression("Auto-Form"));
 	}
 
 	private void initSearch() {

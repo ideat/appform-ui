@@ -3,13 +3,12 @@ package com.mindware.backend.entity;
 import lombok.Data;
 
 @Data
-public class Parameter {
-
+public class Service {
     private String id;
 
     private String name;
 
-    private String category;
+    private String checked;
 
-    private String value;
+    private String category;
 }

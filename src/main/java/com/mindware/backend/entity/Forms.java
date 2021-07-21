@@ -61,6 +61,13 @@ public class Forms {
 
     private String idUser;
 
+    private String nameClientVinculation;
+
+    private String documentClientVinculation;
+
+    private String accountServiceOperation; //json
+
+    private String userDigitalBank;
 }
 
 

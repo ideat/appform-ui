@@ -37,4 +37,8 @@ public class DetailsDrawerFooter extends FlexBoxLayout {
 		return cancel.addClickListener(listener);
 	}
 
+	public void saveState(boolean state){
+		save.setEnabled(state);
+	}
+
 }

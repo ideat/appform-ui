@@ -3,10 +3,8 @@ package com.mindware.ui.views.forms;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mindware.backend.entity.Beneficiary;
-import com.mindware.ui.components.FlexBoxLayout;
-import com.mindware.ui.layout.size.Size;
-import com.mindware.ui.util.LumoStyles;
-import com.mindware.ui.util.UIUtils;
+import com.mindware.backend.entity.netbank.dto.GbageLabDto;
+import com.mindware.backend.rest.netbank.GbageLabDtoRestTemplate;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -21,14 +19,16 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextArea;
+import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.theme.lumo.Lumo;
 import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @CssImport("./styles/my-dialog.css")
 public class BeneficiaryView extends Dialog {
@@ -42,19 +42,26 @@ public class BeneficiaryView extends Dialog {
     private Button min;
     private Button max;
 
-//    public Button btnSave;
-
     private VerticalLayout content;
-//    private Footer footer;
+
     private List<Beneficiary> beneficiaryList = new ArrayList<>();
 
     private BeneficiaryRegisterView beneficiaryRegisterView;
     private Grid<Beneficiary> grid;
+    private Grid<GbageLabDto> grid2;
+    private List<GbageLabDto> gbageLabDtoList = new ArrayList<>();
+    private GbageLabDtoRestTemplate gbageLabDtoRestTemplateGlobal;
 
-    public BeneficiaryView(String beneficiary){
+    private BeneficiarySearch beneficiarySearch;
+
+    private RadioButtonGroup<String> radioSearch = new RadioButtonGroup<>();
+
+    public BeneficiaryView(String beneficiary, GbageLabDtoRestTemplate gbageLabDtoRestTemplate){
         setDraggable(true);
         setModal(false);
         setResizable(true);
+
+        gbageLabDtoRestTemplateGlobal = gbageLabDtoRestTemplate;
 
         // Dialog theming
         getElement().getThemeList().add("my-dialog");
@@ -64,7 +71,7 @@ public class BeneficiaryView extends Dialog {
         getElement().setAttribute("aria-labelledby", "dialog-title");
 
         // Header
-        H2 title = new H2("Formulario Apertura de Ahorro");
+        H2 title = new H2("Formulario Beneficiarios");
         title.addClassName("dialog-title");
 
         min = new Button(VaadinIcon.DOWNLOAD_ALT.create());
@@ -74,6 +81,8 @@ public class BeneficiaryView extends Dialog {
         max.addClickListener(event -> maximise());
 
         //////////////////
+
+        setFinalBeneficiaryList(beneficiary);
 
         Button close = new Button(VaadinIcon.CLOSE_SMALL.create());
         close.addClickListener(event -> close());
@@ -85,37 +94,71 @@ public class BeneficiaryView extends Dialog {
         // Content
         HorizontalLayout flex = new HorizontalLayout();
         
-        Button btnSearch = new Button("Buscar");
+        Button btnSearch = new Button("Añadir");
         btnSearch.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         btnSearch.setIcon(VaadinIcon.SEARCH.create());
 
         TextField search = new TextField();
+        search.setPlaceholder("Ingrese carnet/nit completo");
 
+        radioSearch.setItems("Carnet", "Codigo Agenda");
+        radioSearch.setHelperText("Seleccione criterio busqueda");
+        radioSearch.setValue("Codigo Agenda");
 
-        flex.add(search,btnSearch);
+        flex.add(radioSearch,search,btnSearch);
         flex.setAlignItems(FlexComponent.Alignment.START);
         flex.setSpacing(true);
 
         btnSearch.addClickListener(event -> {
-
-            Beneficiary newItem = new Beneficiary();
-            beneficiaryRegisterView = new BeneficiaryRegisterView(newItem);
             Footer footer = new Footer();
+            Beneficiary newItem = new Beneficiary();
+
+            resultSearch(radioSearch.getValue(),search.getValue());
             Button save = new Button("Guardar");
-            save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-            footer.add(save);
-            save.addClickListener(e -> {
-                if(beneficiaryRegisterView.save()) {
-                    beneficiaryRegisterView.close();
-                    beneficiaryList.add(beneficiaryRegisterView.beneficiaryGlobal);
-                    grid.setItems(beneficiaryList);
-                }
 
-            });
-            beneficiaryRegisterView.add(footer);
-            beneficiaryRegisterView.open();
+            if(gbageLabDtoList.size()==0){
+                beneficiaryRegisterView = new BeneficiaryRegisterView(newItem);
 
+                save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+                footer.add(save);
+                beneficiaryRegisterView.add(footer);
+                beneficiaryRegisterView.open();
+                save.addClickListener(e -> {
+                    if(beneficiaryRegisterView.save()) {
+                        beneficiaryRegisterView.close();
+                        beneficiaryList.add(beneficiaryRegisterView.beneficiaryGlobal);
+                        grid.setItems(beneficiaryList);
+                    }
+                });
 
+            }else if(gbageLabDtoList.size()==1){
+                newItem.setFullName(gbageLabDtoList.get(0).getGbagenomb());
+                newItem.setIdCard(gbageLabDtoList.get(0).getGbagendid());
+                newItem.setTelephone(gbageLabDtoList.get(0).getGbagetlfd());
+                newItem.setEconomicActivity(gbageLabDtoList.get(0).getGblabdact());
+                newItem.setNationality(gbageLabDtoList.get(0).getGbagenaci());
+                newItem.setAddress(gbageLabDtoList.get(0).getGbagedir1());
+
+                save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+                footer.add(save);
+                beneficiaryRegisterView = new BeneficiaryRegisterView(newItem);
+                beneficiaryRegisterView.add(footer);
+                beneficiaryRegisterView.open();
+                save.addClickListener(e -> {
+                    if(beneficiaryRegisterView.save()) {
+                        beneficiaryRegisterView.close();
+                        beneficiaryList.add(beneficiaryRegisterView.beneficiaryGlobal);
+                        grid.setItems(beneficiaryList);
+                    }
+                });
+
+            }else{
+                //Resultado de busqueda
+                gridGbageLabDto();
+                beneficiarySearch = new BeneficiarySearch(grid2);
+                beneficiarySearch.open();
+
+            }
 
         });
 
@@ -127,18 +170,8 @@ public class BeneficiaryView extends Dialog {
         content.setAlignItems(FlexComponent.Alignment.STRETCH);
         add(content);
 
-        // Footer
-//        btnSave = new Button("Guardar");
-//        btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-//        btnSave.addClickListener(event -> {
-//
-//        });
-
         Button attachFiles = new Button(VaadinIcon.PAPERCLIP.create());
         Button discardDraft = new Button(VaadinIcon.TRASH.create());
-
-//        footer = new Footer(btnSave, attachFiles, discardDraft);
-//        add(footer);
 
         // Button theming
         for (Button button : new Button[] { min, max, close, attachFiles, discardDraft }) {
@@ -151,6 +184,13 @@ public class BeneficiaryView extends Dialog {
         ObjectMapper mapper = new ObjectMapper();
         String result = mapper.writeValueAsString(beneficiaryList);
         return result;
+    }
+
+    @SneakyThrows
+    private void setFinalBeneficiaryList(String beneficiary){
+        ObjectMapper mapper = new ObjectMapper();
+        beneficiary = (beneficiary==null || beneficiary=="") ?"[]":beneficiary;
+        beneficiaryList = mapper.readValue(beneficiary,new TypeReference<List<Beneficiary>>(){});
     }
 
     private void gridBeneficiary(){
@@ -167,15 +207,6 @@ public class BeneficiaryView extends Dialog {
         grid.addColumn(new ComponentRenderer<>(this::createButtons))
                 .setFlexGrow(0).setAutoWidth(true);
 
-//        return grid;
-
-    }
-
-    private FormLayout layout(){
-        FormLayout formBeneficiary = new FormLayout();
-
-
-        return formBeneficiary;
     }
 
     @SneakyThrows
@@ -204,11 +235,112 @@ public class BeneficiaryView extends Dialog {
             btnDelete.setEnabled(true);
         }
 
+        btnDelete.addClickListener(event -> {
+            List<Beneficiary> b = beneficiaryList
+                    .stream()
+                    .filter(e -> !e.getId().equals(beneficiary.getId()))
+                    .collect(Collectors.toList());
+            beneficiaryList = b;
+            grid.setItems(beneficiaryList);
+        });
+
+        btnEdit.addClickListener(event -> {
+            Footer footer = new Footer();
+            Button save = new Button("Guardar");
+            save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+            footer.add(save);
+            beneficiaryRegisterView = new BeneficiaryRegisterView(beneficiary);
+
+            beneficiaryRegisterView.add(footer);
+            beneficiaryRegisterView.open();
+            save.addClickListener(e -> {
+                if(beneficiaryRegisterView.save()) {
+                    beneficiaryRegisterView.close();
+
+                    List<Beneficiary> b = beneficiaryList
+                            .stream()
+                            .filter(ev -> !ev.getId().equals(beneficiaryRegisterView.beneficiaryGlobal.getId()))
+                            .collect(Collectors.toList());
+                    beneficiaryList = b;
+
+                    beneficiaryList.add(beneficiaryRegisterView.beneficiaryGlobal);
+                    grid.setItems(beneficiaryList);
+                }
+            });
+
+        });
+
         HorizontalLayout layout = new HorizontalLayout();
         layout.add(btnEdit,btnDelete);
         return layout;
 
     }
+///////////
+
+    public void gridGbageLabDto(){
+        grid2 = new Grid();
+        grid2.setItems(gbageLabDtoList);
+        grid2.addColumn(GbageLabDto::getGbagendid)
+                .setFlexGrow(1)
+                .setAutoWidth(true)
+                .setHeader("Carnet");
+        grid2.addColumn(GbageLabDto::getGbagenomb)
+                .setFlexGrow(1)
+                .setAutoWidth(true)
+                .setHeader("Nombre completo");
+        grid2.addColumn(GbageLabDto::getGblabdact)
+                .setFlexGrow(1)
+                .setAutoWidth(true)
+                .setHeader("Actividad");
+        grid2.addColumn(new ComponentRenderer<>(this::createButtonSelect))
+                .setFlexGrow(0).setAutoWidth(true);
+
+    }
+
+    private Component createButtonSelect(GbageLabDto gbageLabDto){
+        Button btnSelect = new Button();
+        btnSelect.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
+        btnSelect.setIcon(VaadinIcon.CHECK.create());
+        btnSelect.addClickListener(event ->{
+            Beneficiary newItem = new Beneficiary();
+            newItem.setFullName(gbageLabDtoList.get(0).getGbagenomb());
+            newItem.setIdCard(gbageLabDtoList.get(0).getGbagendid());
+            newItem.setTelephone(gbageLabDtoList.get(0).getGbagetlfd());
+            newItem.setEconomicActivity(gbageLabDtoList.get(0).getGblabdact());
+            newItem.setNationality(gbageLabDtoList.get(0).getGbagenaci());
+            newItem.setAddress(gbageLabDtoList.get(0).getGbagedir1());
+            beneficiaryRegisterView = new BeneficiaryRegisterView(newItem);
+            Footer footer = new Footer();
+            Button save = new Button("Guardar");
+            footer.add(save);
+            beneficiaryRegisterView.add(footer);
+            beneficiaryRegisterView.open();
+            save.addClickListener(e -> {
+                if(beneficiaryRegisterView.save()) {
+                    beneficiaryRegisterView.close();
+                    beneficiaryList.add(beneficiaryRegisterView.beneficiaryGlobal);
+                    grid.setItems(beneficiaryList);
+                }
+            });
+            beneficiarySearch.close();
+
+        });
+
+        return btnSelect;
+    }
+
+    private void resultSearch(String categoria, String searchBy){
+//        List<GbageLabDto> gbageLabDtoList = new ArrayList<>();
+        if(categoria.equals("Carnet")) {
+            searchBy = searchBy.concat("%");
+            gbageLabDtoList = gbageLabDtoRestTemplateGlobal.findGbageLabDtoByIdCard(searchBy);
+        }else{
+            gbageLabDtoList = gbageLabDtoRestTemplateGlobal.findGbageLabDtoByCage(searchBy);
+        }
+
+    }
+
+
 
     private void minimise() {
         if (isDocked) {

@@ -1,8 +1,13 @@
 package com.mindware.ui;
 
 import com.mindware.backend.entity.Options;
+import com.mindware.backend.entity.netbank.Gbpmt;
+import com.mindware.backend.entity.netbank.dto.AdusrOfi;
+import com.mindware.backend.rest.netbank.AdusrOfiRestTemplate;
+import com.mindware.backend.rest.netbank.GbpmtRestTemplate;
 import com.mindware.ui.views.forms.FormSearchView;
 import com.mindware.ui.views.login.LoginView;
+import com.mindware.ui.views.parameter.ParameterView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasElement;
 import com.vaadin.flow.component.UI;
@@ -35,6 +40,7 @@ import com.mindware.ui.views.personnel.Accountants;
 import com.mindware.ui.views.personnel.Managers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +61,7 @@ import java.util.List;
 @PWA(name = "Appform UI", shortName = "Appform UI", iconPath = "images/logo-18.png", backgroundColor = "#5074a4", themeColor = "#5074a4")
 @Viewport("width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes")
 @Route("main")
-//@Theme(value = Lumo.class)
+
 public class MainLayout extends FlexBoxLayout
 		implements RouterLayout, PageConfigurator, AfterNavigationObserver {
 
@@ -80,6 +86,8 @@ public class MainLayout extends FlexBoxLayout
 
 	public List<Options> optionList = new ArrayList<>();
 
+
+
 	public MainLayout() {
 		VaadinSession.getCurrent()
 				.setErrorHandler((ErrorHandler) errorEvent -> {
@@ -93,6 +101,8 @@ public class MainLayout extends FlexBoxLayout
 		setFlexDirection(FlexDirection.COLUMN);
 		setSizeFull();
 
+
+
 		// Initialise the UI building blocks
 		initStructure();
 
@@ -102,6 +112,7 @@ public class MainLayout extends FlexBoxLayout
 		// Configure the headers and footers (optional)
 		initHeadersAndFooters();
 	}
+
 
 	/**
 	 * Initialise the required components and containers.
@@ -132,19 +143,13 @@ public class MainLayout extends FlexBoxLayout
 	 */
 	private void initNaviItems() {
 		NaviMenu menu = naviDrawer.getMenu();
-//		menu.addNaviItem(VaadinIcon.HOME, "Home", Home.class);
-//		menu.addNaviItem(VaadinIcon.INSTITUTION, "Accounts", Accounts.class);
-//		menu.addNaviItem(VaadinIcon.CREDIT_CARD, "Payments", Payments.class);
-//		menu.addNaviItem(VaadinIcon.CHART, "Statistics", Statistics.class);
 		menu.addNaviItem(VaadinIcon.FILE, "Formularios", FormSearchView.class);
-
 		NaviItem personnel = menu.addNaviItem(VaadinIcon.STOP_COG, "Configuracion",
 				null);
-		menu.addNaviItem(personnel, "Parametros", Home.class);
+		menu.addNaviItem(personnel, "Parametros", ParameterView.class);
 		menu.addNaviItem(personnel, "Usuarios", Home.class);
 
 	}
-
 
 	/**
 	 * Configure the app's inner and outer headers and footers.

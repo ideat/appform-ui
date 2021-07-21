@@ -54,7 +54,7 @@ public class BeneficiaryRegisterView extends Dialog {
         getElement().setAttribute("aria-labelledby", "dialog-title");
 
         // Header
-        H2 title = new H2("Formulario Apertura de Ahorro - " );
+        H2 title = new H2("Formulario Registro Beneficiario" );
         title.addClassName("dialog-title");
 
         min = new Button(VaadinIcon.DOWNLOAD_ALT.create());
@@ -79,21 +79,8 @@ public class BeneficiaryRegisterView extends Dialog {
         content.setAlignItems(FlexComponent.Alignment.STRETCH);
         add(content);
 
-        // Footer
-//        Button save = new Button("Guardar");
-//        save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-//
-//        save.addClickListener( event -> {
-//            valueClose = "Se presiono guardar";
-//            beneficiary.setIdCard("idcard");
-//            close();
-//
-//        });
         Button attachFiles = new Button(VaadinIcon.PAPERCLIP.create());
         Button discardDraft = new Button(VaadinIcon.TRASH.create());
-
-//        footer = new Footer(save, attachFiles, discardDraft);
-//        add(footer);
 
         // Button theming
         for (Button button : new Button[] { min, max, close, attachFiles, discardDraft }) {
@@ -116,16 +103,13 @@ public class BeneficiaryRegisterView extends Dialog {
     public FormLayout registerForm(){
 
         binder = new BeanValidationBinder<>(Beneficiary.class);
-        binder.readBean(beneficiaryGlobal);
+
 
         TextField fullName = new TextField();
         fullName.setWidthFull();
 
         TextField idCard = new TextField();
-        idCard.setWidth("60%");
-
-        ComboBox<String> expedition = new ComboBox();
-        expedition.setWidth("30%");
+        idCard.setWidth("100%");
 
         TextField telephone  = new TextField();
         telephone.setWidthFull();
@@ -134,6 +118,7 @@ public class BeneficiaryRegisterView extends Dialog {
         economicActivity.setWidthFull();
 
         ComboBox<String> nationality = new ComboBox();
+        nationality.setItems("BOLIVIANA","ARGENTINA" );
         nationality.setWidthFull();
 
         TextField address = new TextField();
@@ -158,7 +143,6 @@ public class BeneficiaryRegisterView extends Dialog {
                 .bind(Beneficiary::getFullName,Beneficiary::setFullName);
         binder.forField(idCard).asRequired("Nro documento es requerido")
                 .bind(Beneficiary::getIdCard,Beneficiary::setIdCard);
-        binder.forField(expedition).bind(Beneficiary::getExtension,Beneficiary::setExtension);
         binder.forField(telephone).bind(Beneficiary::getTelephone,Beneficiary::setTelephone);
         binder.forField(economicActivity).bind(Beneficiary::getEconomicActivity,Beneficiary::setEconomicActivity);
         binder.forField(nationality).bind(Beneficiary::getNationality,Beneficiary::setNationality);
@@ -166,19 +150,14 @@ public class BeneficiaryRegisterView extends Dialog {
         binder.forField(sourceFounds).bind(Beneficiary::getSourceFounds,Beneficiary::setSourceFounds);
 
         formBeneficiary.addFormItem(fullName,"Nombre completo");
-        FlexBoxLayout layoutIdCard = new FlexBoxLayout(idCard, expedition);
-        layoutIdCard.setFlexGrow(1,idCard);
-        layoutIdCard.setFlexGrow(1,expedition);
-        layoutIdCard.setSpacing(Right.S);
-
-        FormLayout.FormItem idCardItem = formBeneficiary.addFormItem(layoutIdCard,"Doc. identificacion/Expedicion");
-        UIUtils.setColSpan(1,idCardItem);
-
+        formBeneficiary.addFormItem(idCard,"Documento identificacion");
         formBeneficiary.addFormItem(telephone,"Telefono");
         formBeneficiary.addFormItem(nationality,"Nacionalidad");
         formBeneficiary.addFormItem(economicActivity,"Actividad economica");
         formBeneficiary.addFormItem(address,"Direccion");
         formBeneficiary.addFormItem(sourceFounds,"Origen de los fondos");
+
+        binder.readBean(beneficiaryGlobal);
 
         return formBeneficiary;
 

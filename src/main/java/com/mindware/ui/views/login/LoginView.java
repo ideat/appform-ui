@@ -1,9 +1,13 @@
 package com.mindware.ui.views.login;
 
 import com.mindware.backend.entity.Users;
+import com.mindware.backend.entity.netbank.Gbpmt;
+import com.mindware.backend.entity.netbank.dto.AdusrOfi;
 import com.mindware.backend.rest.login.JwtRequest;
 import com.mindware.backend.rest.login.LoginRestTemplate;
 import com.mindware.backend.rest.login.Token;
+import com.mindware.backend.rest.netbank.AdusrOfiRestTemplate;
+import com.mindware.backend.rest.netbank.GbpmtRestTemplate;
 import com.mindware.backend.rest.user.UserRestTemplate;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.login.LoginForm;
@@ -31,6 +35,12 @@ public class LoginView extends VerticalLayout {
     @Autowired
     private UserRestTemplate userRestTemplate;
 
+    @Autowired
+    private GbpmtRestTemplate gbpmtRestTemplate;
+
+    @Autowired
+    private AdusrOfiRestTemplate adusrOfiRestTemplate;
+
     public LoginView(){
         restTemplate = new LoginRestTemplate();
 //        userRestTemplate = new UserRestTemplate();
@@ -39,19 +49,26 @@ public class LoginView extends VerticalLayout {
 
         component.addLoginListener(e ->{
             JwtRequest jwtRequest = new JwtRequest();
-            jwtRequest.setUsername(e.getUsername());
+            jwtRequest.setUsername(e.getUsername().toUpperCase());
             jwtRequest.setPassword(e.getPassword());
             try {
                 Token token = restTemplate.getToken(jwtRequest);
+                String loginUser = e.getUsername().toUpperCase();
                 VaadinSession.getCurrent().setAttribute("jwt", token.getToken());
-                VaadinSession.getCurrent().setAttribute("login",e.getUsername());
-                Users users = userRestTemplate.findByLogin(e.getUsername());
+                VaadinSession.getCurrent().setAttribute("login",loginUser);
+                Users users = userRestTemplate.findByLogin(loginUser);
+                AdusrOfi adusrOfi = adusrOfiRestTemplate.findByLogin(loginUser);
+                Gbpmt gbpmt = gbpmtRestTemplate.findAll();
+
+                VaadinSession.getCurrent().setAttribute("type-change", gbpmt.getGbpmttcof());
+                VaadinSession.getCurrent().setAttribute("name-office",adusrOfi.getGbofides1());
+
                 if(users.getState().equals("active")) {
                     UI.getCurrent().navigate("main");
                 }else if(users.getState().equals("RESET")){
                     Map<String, List<String>> param = new HashMap<>();
                     List<String> login = new ArrayList<>();
-                    login.add(e.getUsername());
+                    login.add(loginUser);
                     param.put("login",login);
                     QueryParameters qp = new QueryParameters(param);
                     UI.getCurrent().navigate("user-update-password",qp);
@@ -62,7 +79,7 @@ public class LoginView extends VerticalLayout {
         });
 
         setSizeFull();
-        getStyle().set("background","url(images/background-login.jpg");
+        getStyle().set("background","url(images/login-register.jpg");
         getStyle().set("align-center","stretch");
         setHorizontalComponentAlignment(Alignment.CENTER,component);
         add(component);
@@ -83,4 +100,6 @@ public class LoginView extends VerticalLayout {
         i18n.setAdditionalInformation("");
         return i18n;
     }
+
+
 }

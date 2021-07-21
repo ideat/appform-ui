@@ -3,6 +3,7 @@ package com.mindware.ui.views.forms;
 import com.mindware.backend.entity.Forms;
 import com.mindware.backend.entity.netbank.dto.DataFormDto;
 import com.mindware.backend.rest.forms.FormsRestTemplate;
+import com.mindware.backend.rest.netbank.GbageLabDtoRestTemplate;
 import com.mindware.ui.util.UIUtils;
 import com.mindware.ui.util.Util;
 import com.vaadin.flow.component.button.Button;
@@ -14,8 +15,10 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Footer;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Header;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.textfield.NumberField;
@@ -46,14 +49,17 @@ public class DialogFormSavingBank extends Dialog {
 
     private Forms forms;
     private FormsRestTemplate formsRestTemplateGlobal;
+    private GbageLabDtoRestTemplate gbageLabDtoRestTemplateGlobal;
 
 
-
-    public DialogFormSavingBank(String accountCode, String categoryTypeForm, String nameTypeForm, DataFormDto dataFormDto, FormsRestTemplate formsRestTemplate ){
+    public DialogFormSavingBank(String accountCode, String categoryTypeForm, String nameTypeForm,
+                                DataFormDto dataFormDto, FormsRestTemplate formsRestTemplate,
+                                GbageLabDtoRestTemplate gbageLabDtoRestTemplate ){
         setDraggable(true);
         setModal(false);
         setResizable(true);
         formsRestTemplateGlobal = formsRestTemplate;
+        gbageLabDtoRestTemplateGlobal = gbageLabDtoRestTemplate;
         // Dialog theming
         getElement().getThemeList().add("my-dialog");
         setWidth("800px");
@@ -113,12 +119,6 @@ public class DialogFormSavingBank extends Dialog {
         maximise();
     }
 
-    private Forms searchForms(String accountCode){
-        Forms f = new Forms();
-
-
-        return f;
-    }
 
     private FormLayout layoutForm(DataFormDto dataFormDto, String nameTypeForm, String categoryTypeForm, String accountCode){
         TextField product = new TextField();
@@ -229,6 +229,12 @@ public class DialogFormSavingBank extends Dialog {
         isFinalBenifeciary.setItems("SI","NO");
 
 
+        TextField nameClientVinculation = new TextField();
+        nameClientVinculation.setWidthFull();
+
+        TextField documentClientVinculation = new TextField();
+        documentClientVinculation.setWidthFull();
+
         FormLayout formAccount = new FormLayout();
         formAccount.setSizeUndefined();
         formAccount.setResponsiveSteps(
@@ -284,6 +290,10 @@ public class DialogFormSavingBank extends Dialog {
         binder.forField(isFinalBenifeciary)
                 .asRequired("Se debe indicar si es el beneficiario final")
                 .bind(Forms::getIsFinalBeneficiary,Forms::setIsFinalBeneficiary);
+        binder.forField(nameClientVinculation)
+                .bind(Forms::getNameClientVinculation,Forms::setNameClientVinculation);
+        binder.forField(documentClientVinculation)
+                .bind(Forms::getDocumentClientVinculation,Forms::setDocumentClientVinculation);
 
         formAccount.addFormItem(product,"Producto");
         formAccount.addFormItem(currency,"Moneda");
@@ -315,21 +325,30 @@ public class DialogFormSavingBank extends Dialog {
         formAccount.addFormItem(secondEconomicActivity,"2da Actividad Económica");
 
         formAccount.addFormItem(reasonOpeningAccount,"Motivo de la apertura de la Cuenta");
-        formAccount.addFormItem(linkingAccount,"Vinculacion a la Cuenta");
 
-        formAccount.addFormItem(isFinalBenifeciary,"Usted es el Beneficiario Final?");
+        formAccount.addFormItem(linkingAccount,"Vinculacion a la Cuenta");
+//        formAccount.addFormItem(isFinalBenifeciary,"Usted es el Beneficiario Final?");
+        Label label1 = new Label();
+        Label label2 = new Label();
+        formAccount.addFormItem(nameClientVinculation,label1);
+        formAccount.addFormItem(documentClientVinculation,label2);
 
         Button btnBeneficiary = new Button("Beneficiarios");
         btnBeneficiary.setEnabled(false);
+        btnBeneficiary.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_CONTRAST);
 
         btnBeneficiary.addClickListener(click -> {
-            BeneficiaryView beneficiaryView = new BeneficiaryView("[]");
+            String be = forms.getBeneficiary()==null || forms.getBeneficiary().isEmpty()?"[]":forms.getBeneficiary();
+
+            BeneficiaryView beneficiaryView = new BeneficiaryView(be, gbageLabDtoRestTemplateGlobal);
             Footer footer = new Footer();
             Button save = new Button("Añadir al formulario");
             save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
             footer.add(save);
             save.addClickListener(event -> {
                 forms.setBeneficiary(beneficiaryView.getFinalBeneficiaryList());
+                UIUtils.dialog("Beneficiarios añadidos, Termine guardando el formulario","success").open();
+                beneficiaryView.close();
             });
 
             beneficiaryView.open();
@@ -356,7 +375,47 @@ public class DialogFormSavingBank extends Dialog {
             if(event.getValue().equals("NO")) btnBeneficiary.setEnabled(true);
         });
 
-        formAccount.addFormItem(btnBeneficiary,"");
+        linkingAccount.addValueChangeListener(event -> {
+
+            if(event.getValue().equals("PADRES O TUTORES LEGALES") ) {
+                label1.setVisible(true);
+                label2.setVisible(true);
+                label1.setText("Nombre del Menor");
+                label2.setText("Número de Documento");
+                nameClientVinculation.setVisible(true);
+                documentClientVinculation.setVisible(true);
+
+
+            }else if(event.getValue().equals("TITULAR") || event.getValue().equals("COTITULAR") ){
+                label1.setVisible(false);
+                label2.setVisible(false);
+                nameClientVinculation.setVisible(false);
+                documentClientVinculation.setVisible(false);
+
+            }else if(event.getValue().equals("APODERADOS")){
+                label1.setVisible(true);
+                label2.setVisible(true);
+                label1.setText("Nombre o Razon Social");
+                label2.setText("Número de Documento/NIT");
+                nameClientVinculation.setVisible(true);
+                documentClientVinculation.setVisible(true);
+
+            }else if(event.getValue().equals("REPRESENTANTE LEGAL")){
+                label1.setVisible(true);
+                label2.setVisible(true);
+                label1.setText("Empresa o Razon Social");
+                label2.setText("Número de NIT");
+                nameClientVinculation.setVisible(true);
+                documentClientVinculation.setVisible(true);
+
+            }
+        });
+
+        HorizontalLayout layout = new HorizontalLayout();
+        layout.add(isFinalBenifeciary,btnBeneficiary);
+
+        FormLayout.FormItem layoutItem = formAccount.addFormItem(layout,"Usted es el Beneficiario Final?");
+        UIUtils.setColSpan(1,layoutItem);
 
         return formAccount;
     }

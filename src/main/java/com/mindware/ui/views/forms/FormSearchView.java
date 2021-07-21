@@ -1,9 +1,12 @@
 package com.mindware.ui.views.forms;
 
+import com.mindware.backend.entity.Parameter;
 import com.mindware.backend.entity.netbank.dto.DataFormDto;
 import com.mindware.backend.entity.netbank.dto.GbageDto;
 import com.mindware.backend.rest.forms.FormsRestTemplate;
 import com.mindware.backend.rest.netbank.GbageDtoRestTemplate;
+import com.mindware.backend.rest.netbank.GbageLabDtoRestTemplate;
+import com.mindware.backend.rest.parameter.ParameterRestTemplate;
 import com.mindware.ui.MainLayout;
 import com.mindware.ui.components.FlexBoxLayout;
 import com.mindware.ui.layout.size.Horizontal;
@@ -12,16 +15,17 @@ import com.mindware.ui.util.UIUtils;
 import com.mindware.ui.util.css.BoxSizing;
 import com.mindware.ui.util.css.Shadow;
 import com.mindware.ui.views.SplitViewFrame;
-import com.vaadin.flow.component.*;
+import com.vaadin.flow.component.AttachEvent;
+import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.Key;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
@@ -49,9 +53,16 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
     @Autowired
     private FormsRestTemplate formsRestTemplate;
 
+    @Autowired
+    private GbageLabDtoRestTemplate gbageLabDtoRestTemplate;
+
+    @Autowired
+    private ParameterRestTemplate parameterRestTemplate;
+
     private List<GbageDto> gbageDtoList = new ArrayList<>();
 
-    DialogFormSavingBank dialogFormSavingBank;
+    private DialogFormSavingBank dialogFormSavingBank;
+    private DialogDigitalBanking dialogDigitalBanking;
 
     @Override
     protected void onAttach(AttachEvent attachment){
@@ -188,7 +199,7 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
 
         Select<String> taskSelect = new Select<>();
         if(gbageDto.getAccountName().equals("VARIOS")){
-            taskSelect.setItems("BANCA DIGITAL", "ENTREGA TD","SERVICIOS TD" );
+            taskSelect.setItems("BANCA DIGITAL", "ENTREGA TD","SERVICIOS TD", "VERIF. SEGIP" );
             taskSelect.setPlaceholder("Seleccionar Tarea");
         }else {
             taskSelect.setItems("FORMULARIO APERTURA", "CONTRATO");
@@ -198,16 +209,23 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
         btnTask.addClickListener(click -> {
             if(!taskSelect.isEmpty()) {
                 if (gbageDto.getAccountName().equals("VARIOS")) {
-                    UIUtils.showNotification("TARJETA DBITO");
+                    if(taskSelect.getValue().equals("BANCA DIGITAL")){
+                        openDialog(gbageDto.getGbagecage(),"",  gbageDto.getAccountName(), taskSelect.getValue());
+                    }
                 } else {
                     if (gbageDto.getAccountName().equals("CAJA-AHORRO") || gbageDto.getAccountName().equals("DPF")) {
-
                         openDialog(gbageDto.getGbagecage(), gbageDto.getAccountCode(), gbageDto.getAccountName(), taskSelect.getValue());
                     }
                 }
             }else{
                 UIUtils.showNotification("Seleccione una tarea a realizar");
             }
+        });
+
+        btnPrint.addClickListener(click ->{
+           FormReportView report = new FormReportView(gbageDto.getGbagecage(),gbageDto.getAccountCode(),
+                  taskSelect.getValue(), gbageDto.getAccountName(),formsRestTemplate);
+           report.open();
         });
 
         HorizontalLayout layout = new HorizontalLayout();
@@ -223,9 +241,17 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
 
         if(categoryTypeForm.equals("CAJA-AHORRO") || categoryTypeForm.equals("DPF")) {
             DataFormDto dataFormDto = formsRestTemplate.findDataFormDtoFormSavingBoxByCageAndAccount(cage, accountCode,categoryTypeForm);
-            dialogFormSavingBank = new DialogFormSavingBank(accountCode, categoryTypeForm, nameTypeForm, dataFormDto, formsRestTemplate);
+            dialogFormSavingBank = new DialogFormSavingBank(accountCode, categoryTypeForm, nameTypeForm,
+                    dataFormDto, formsRestTemplate, gbageLabDtoRestTemplate);
+            dialogFormSavingBank.open();
+        }else if(categoryTypeForm.equals("VARIOS") && nameTypeForm.equals("BANCA DIGITAL")){
+            List<Parameter> parameterList = parameterRestTemplate.findAll();
+
+            List<DataFormDto> dataFormDto = formsRestTemplate.findDataFormForDigitalBank(cage);
+            dialogDigitalBanking = new DialogDigitalBanking(dataFormDto, parameterList, formsRestTemplate);
+            dialogDigitalBanking.open();
         }
-        dialogFormSavingBank.open();
+
     }
 
 }
