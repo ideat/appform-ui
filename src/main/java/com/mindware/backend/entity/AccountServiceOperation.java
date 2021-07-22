@@ -9,14 +9,16 @@ import java.time.LocalDate;
 public class AccountServiceOperation {
     private String id;
 
-    private LocalDate createDate;
+    private String createDate;
 
     private String account;
 
     private String services; //json parameter
 
-    private String user;
-
     private String reasonOpening;
+
+    private Double extensionAmount;
+
+    private Double decreaseAmount;
 
 }

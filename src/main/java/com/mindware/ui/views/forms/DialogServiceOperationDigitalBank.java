@@ -1,9 +1,8 @@
 package com.mindware.ui.views.forms;
 
-import com.mindware.backend.entity.Forms;
-import com.mindware.backend.entity.Parameter;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mindware.backend.entity.Service;
-import com.mindware.backend.entity.netbank.dto.DataFormDto;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -18,10 +17,11 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextArea;
-import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.theme.lumo.Lumo;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -39,11 +39,9 @@ public class DialogServiceOperationDigitalBank extends Dialog {
     private Header header;
     private Button min;
     private Button max;
-    private Button btnSave;
-    private Button discardDraft;
 
     private VerticalLayout content;
-    private Footer footer;
+    public Footer footer;
 
     private List<Service> serviceListGlobal;
     private List<Service> operationListGlobal;
@@ -51,7 +49,18 @@ public class DialogServiceOperationDigitalBank extends Dialog {
     private List<String> serviceStringList;
     private List<String> operationStringList;
 
-    public DialogServiceOperationDigitalBank(List<Service> serviceList, Set<String> accounts){
+    public Set<String> servicesSelected;
+    public Set<String> operationsSelected;
+
+    private List<String> serviceInitialSelected;
+    private List<String> operationInitialSelected;
+
+    public TextArea textArea;
+
+    public  NumberField extensionAmount;
+    public  NumberField decreaseAmount;
+
+    public DialogServiceOperationDigitalBank(List<Service> serviceList){
         setDraggable(true);
         setModal(false);
         setResizable(true);
@@ -84,26 +93,25 @@ public class DialogServiceOperationDigitalBank extends Dialog {
         header.getElement().getThemeList().add(Lumo.DARK);
         add(header);
 
-        btnSave = new Button("Guardar");
-        discardDraft = new Button(VaadinIcon.TRASH.create());
         // Content
-//        forms = formsRestTemplateGlobal.findByIdAccountAndTypeFormAndCategoryTypeForm(accountCode,nameTypeForm,categoryTypeForm);
-//        binderDataFormDto = new BeanValidationBinder(DataFormDto.class);
-//        binder = new BeanValidationBinder<>(Forms.class);
 
-        content = new VerticalLayout(layoutServiceOperations());
+        extensionAmount = new NumberField("Ampliacion limite Bs");
+        extensionAmount.setWidthFull();
+        extensionAmount.setVisible(false);
+        decreaseAmount = new NumberField("Disminucion limite Bs");
+        decreaseAmount.setWidthFull();
+        decreaseAmount.setVisible(false);
+
+        textArea = new TextArea("Motivos para habilitacion de servicios");
+        textArea.setWidthFull();
+        content = new VerticalLayout(layoutServiceOperations(), textArea);
         content.addClassName("dialog-content");
         content.setAlignItems(FlexComponent.Alignment.STRETCH);
         add(content);
 
         // Footer
 
-        btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-
-//        Button attachFiles = new Button(VaadinIcon.PAPERCLIP.create());
-
-        discardDraft.addThemeVariants(ButtonVariant.LUMO_ERROR,ButtonVariant.LUMO_TERTIARY);
-        footer = new Footer(btnSave,  discardDraft);
+        footer = new Footer();
         add(footer);
 
         // Button theming
@@ -112,6 +120,43 @@ public class DialogServiceOperationDigitalBank extends Dialog {
         }
 //        maximise();
     }
+
+    public String getServices()  {
+        List<Service> serviceState = new ArrayList<>();
+
+        for(String s:servicesSelected){
+            Service service = serviceListGlobal.stream()
+                    .filter(f -> f.getName().equals(s))
+                    .collect(Collectors.toList()).get(0);
+            service.setChecked("SI");
+            serviceListGlobal.removeIf(d -> d.getName().equals(s));
+            serviceListGlobal.add(service);
+        }
+
+        for(String s:operationsSelected){
+            Service service = operationListGlobal.stream()
+                    .filter(f -> f.getName().equals(s))
+                    .collect(Collectors.toList()).get(0);
+            service.setChecked("SI");
+            operationListGlobal.removeIf(d -> d.getName().equals(s));
+            operationListGlobal.add(service);
+        }
+
+        serviceState.addAll(serviceListGlobal);
+        serviceState.addAll(operationListGlobal);
+
+        ObjectMapper mapper = new ObjectMapper();
+        String result = "";
+        try {
+            result = mapper.writeValueAsString(serviceState);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        return  result;
+    }
+
+
 
     private void fillServicesOperations(List<Service> serviceList){
         serviceListGlobal = serviceList.stream()
@@ -127,6 +172,19 @@ public class DialogServiceOperationDigitalBank extends Dialog {
         operationStringList = operationListGlobal.stream()
                 .map(Service::getName)
                 .collect(Collectors.toList());
+
+        serviceInitialSelected = serviceListGlobal.stream()
+                .filter(s -> s.getChecked().equals("SI"))
+                .map(Service::getName)
+                .collect(Collectors.toList());
+        servicesSelected = Set.copyOf(serviceInitialSelected);
+
+        operationInitialSelected = operationListGlobal.stream()
+                .filter(s -> s.getChecked().equals("SI"))
+                .map(Service::getName)
+                .collect(Collectors.toList());
+        operationsSelected = Set.copyOf(operationInitialSelected);
+
     }
 
     private VerticalLayout createLayoutService(){
@@ -140,6 +198,8 @@ public class DialogServiceOperationDigitalBank extends Dialog {
         checkboxGroupService.addThemeVariants(CheckboxGroupVariant.LUMO_VERTICAL);
         checkboxGroupService.setHelperText("Seleccione los Servicios");
 
+        checkboxGroupService.select(serviceInitialSelected);
+
         checkboxGroupService.addValueChangeListener(event -> {
            if(event.getValue().size() == serviceStringList.size()){
                checkboxService.setValue(true);
@@ -148,7 +208,21 @@ public class DialogServiceOperationDigitalBank extends Dialog {
                checkboxService.setValue(false);
                checkboxService.setIndeterminate(false);
            }else checkboxService.setIndeterminate(true);
+           servicesSelected = event.getValue();
 
+           if(event.getValue().contains("AMPLIACION DE LIMITE HASTA")){
+               extensionAmount.setVisible(true);
+           }else {
+               extensionAmount.setVisible(false);
+               extensionAmount.setValue(0.0);
+           }
+
+            if(event.getValue().contains("DISMINUCION DE LIMITE HASTA")){
+                decreaseAmount.setVisible(true);
+            }else {
+                decreaseAmount.setVisible(false);
+                decreaseAmount.setValue(0.0);
+            }
         });
 
         checkboxService.addValueChangeListener(event -> {
@@ -160,10 +234,11 @@ public class DialogServiceOperationDigitalBank extends Dialog {
         });
 
         VerticalLayout layout = new VerticalLayout();
-        layout.add(checkboxService, checkboxGroupService);
+        layout.add(checkboxService, checkboxGroupService, extensionAmount, decreaseAmount);
         
         return layout;
     }
+
 
     private VerticalLayout createLayoutOperations(){
 
@@ -176,6 +251,8 @@ public class DialogServiceOperationDigitalBank extends Dialog {
         checkboxGroupOperation.addThemeVariants(CheckboxGroupVariant.LUMO_VERTICAL);
         checkboxGroupOperation.setHelperText("Seleccione los Servicios");
 
+        checkboxGroupOperation.select(operationInitialSelected);
+
         checkboxGroupOperation.addValueChangeListener(event -> {
             if(event.getValue().size() == operationStringList.size()){
                 checkboxOperation.setValue(true);
@@ -184,7 +261,7 @@ public class DialogServiceOperationDigitalBank extends Dialog {
                 checkboxOperation.setValue(false);
                 checkboxOperation.setIndeterminate(false);
             }else checkboxOperation.setIndeterminate(true);
-
+            operationsSelected = event.getValue();
         });
 
         checkboxOperation.addValueChangeListener(event -> {

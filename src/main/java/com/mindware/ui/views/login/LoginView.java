@@ -62,6 +62,7 @@ public class LoginView extends VerticalLayout {
 
                 VaadinSession.getCurrent().setAttribute("type-change", gbpmt.getGbpmttcof());
                 VaadinSession.getCurrent().setAttribute("name-office",adusrOfi.getGbofides1());
+                VaadinSession.getCurrent().setAttribute("current-date",gbpmt.getGbpmtfdia());
 
                 if(users.getState().equals("active")) {
                     UI.getCurrent().navigate("main");

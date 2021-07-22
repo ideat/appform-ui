@@ -15,10 +15,7 @@ import com.mindware.ui.util.UIUtils;
 import com.mindware.ui.util.css.BoxSizing;
 import com.mindware.ui.util.css.Shadow;
 import com.mindware.ui.views.SplitViewFrame;
-import com.vaadin.flow.component.AttachEvent;
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.Key;
-import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
@@ -93,6 +90,8 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
         TextField textToSearch = new TextField();
         textToSearch.setValueChangeMode(ValueChangeMode.EAGER);
 
+
+
         Button btnSearch = new Button("Buscar", new Icon(VaadinIcon.SEARCH));
 
         btnSearch.addClickListener(click -> {
@@ -106,8 +105,12 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
             setViewContent(createContent());
         });
 
-        UI.getCurrent().addShortcutListener(
-                () -> btnSearch.click(), Key.ENTER);
+        textToSearch.getElement().addEventListener("keyup", e->{
+            btnSearch.click();
+        }).addEventData("element.value").setFilter("event.keyCode == 13");
+
+//        UI.getCurrent().addShortcutListener(
+//                () -> btnSearch.click(), Key.ENTER);
 
         panelSearch.add(radioSearch, textToSearch, btnSearch);
         panelSearch.setSpacing(true);

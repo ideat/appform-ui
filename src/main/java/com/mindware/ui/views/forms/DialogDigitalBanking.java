@@ -9,6 +9,8 @@ import com.mindware.backend.entity.Parameter;
 import com.mindware.backend.entity.Service;
 import com.mindware.backend.entity.netbank.dto.DataFormDto;
 import com.mindware.backend.rest.forms.FormsRestTemplate;
+import com.mindware.ui.util.UIUtils;
+import com.mindware.ui.util.Util;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -28,13 +30,11 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
+import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.theme.lumo.Lumo;
 
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @CssImport("./styles/my-dialog.css")
 public class DialogDigitalBanking extends Dialog {
@@ -68,6 +68,7 @@ public class DialogDigitalBanking extends Dialog {
     private DialogServiceOperationDigitalBank dialogServiceOperationDigitalBank;
 
     private  Set<String> accountsSelected;
+    private Grid<AccountServiceOperation> grid;
 
     public DialogDigitalBanking(List<DataFormDto> dataFormDto, List<Parameter> parameterList, FormsRestTemplate formsRestTemplate)  {
 
@@ -75,7 +76,7 @@ public class DialogDigitalBanking extends Dialog {
         setModal(false);
         setResizable(true);
 
-        servicesList = new ArrayList<>();
+//        servicesList = new ArrayList<>();
         parameterListGlobal = parameterList;
         dataFormDtoGlobal = dataFormDto;
         formsDigitalBank = formsRestTemplate.findByIdClientAndTypeFormAndCategoryTypeForm(dataFormDto.get(0).getCodeClient(),"BANCA DIGITAL","VARIOS");
@@ -114,8 +115,8 @@ public class DialogDigitalBanking extends Dialog {
 //        forms = formsRestTemplateGlobal.findByIdAccountAndTypeFormAndCategoryTypeForm(accountCode,nameTypeForm,categoryTypeForm);
         binderDataFormDto = new BeanValidationBinder(DataFormDto.class);
         binderForms = new BeanValidationBinder<>(Forms.class);
-
-        content = new VerticalLayout(formDataClient(),layoutAccounts(), createGridExistingForms() );
+        createGridExistingForms();
+        content = new VerticalLayout(formDataClient(),layoutAccounts(),grid );
         content.addClassName("dialog-content");
         content.setAlignItems(FlexComponent.Alignment.STRETCH);
         add(content);
@@ -209,14 +210,37 @@ public class DialogDigitalBanking extends Dialog {
 
         btnCreate.addClickListener(event -> {
             fillNewServicesAndOperations();
-            dialogServiceOperationDigitalBank = new DialogServiceOperationDigitalBank(servicesList,accountsSelected);
+            Button btnSave = new Button("Agregar");
+            btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+            dialogServiceOperationDigitalBank = new DialogServiceOperationDigitalBank(servicesList);
+            dialogServiceOperationDigitalBank.footer.add(btnSave);
             dialogServiceOperationDigitalBank.open();
+            btnSave.addClickListener(click -> {
+                try {
+                    AccountServiceOperation accountServiceOperation = new AccountServiceOperation();
+                    accountServiceOperation.setId(UUID.randomUUID().toString());
+
+                    accountServiceOperation.setAccount(String.join(" - ",accountsSelected));
+                    accountServiceOperation.setServices(dialogServiceOperationDigitalBank.getServices());
+                    accountServiceOperation.setExtensionAmount(dialogServiceOperationDigitalBank.extensionAmount.getValue());
+                    accountServiceOperation.setDecreaseAmount(dialogServiceOperationDigitalBank.decreaseAmount.getValue());
+                    accountServiceOperation.setReasonOpening(dialogServiceOperationDigitalBank.textArea.getValue());
+                    Date currentDate = (Date) VaadinSession.getCurrent().getAttribute("current-date");
+                    accountServiceOperation.setCreateDate(Util.formatDate(currentDate,"dd/MM/yyyy"));
+                    accountServiceOperationList.add(accountServiceOperation);
+                    dialogServiceOperationDigitalBank.close();
+                    grid.setItems(accountServiceOperationList);
+                    UIUtils.dialog("Cuentas agregadas", "success").open();
+                }catch(Exception e){
+                    UIUtils.dialog("Existe un error, revise los datos", "error").open();
+                }
+            });
         });
 
         return layout;
     }
 
-    private Grid createGridExistingForms()  {
+    private void createGridExistingForms()  {
         if(formsDigitalBank.getId()!=null){
             ObjectMapper mapper = new ObjectMapper();
             if(formsDigitalBank.getAccountServiceOperation()!=null) {
@@ -233,7 +257,7 @@ public class DialogDigitalBanking extends Dialog {
             }
         }else  accountServiceOperationList = new ArrayList<>();
 
-        Grid<AccountServiceOperation> grid = new Grid<>();
+        grid = new Grid<>();
         grid.setSizeFull();
         grid.setItems(accountServiceOperationList);
         grid.addColumn(AccountServiceOperation::getAccount)
@@ -241,8 +265,7 @@ public class DialogDigitalBanking extends Dialog {
                 .setFlexGrow(0)
                 .setResizable(true)
                 .setAutoWidth(true);
-        grid.addColumn(new LocalDateRenderer<>(AccountServiceOperation::getCreateDate
-                , DateTimeFormatter.ofPattern("dd/MM/yyyy")))
+        grid.addColumn(AccountServiceOperation::getCreateDate)
                 .setHeader("Fecha creacion")
                 .setFlexGrow(0)
                 .setResizable(true)
@@ -251,11 +274,11 @@ public class DialogDigitalBanking extends Dialog {
                 .setFlexGrow(0).setAutoWidth(true);
 
 
-        return grid;
 
     }
 
     private void fillNewServicesAndOperations(){
+        servicesList = new ArrayList<>();
         for(Parameter parameter : parameterListGlobal){
             Service s = new Service();
             if(parameter.getCategory().equals("BANCA DIGITAL, SERVICIOS") ||
@@ -293,29 +316,43 @@ public class DialogDigitalBanking extends Dialog {
         layout.add(btnEdit,btnPrint);
 
         btnEdit.addClickListener(click -> {
-
             fillRegisteredServicesAndOperations(accountServiceOperation.getServices());
+            Button btnSave = new Button("Modificar");
+            btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+            dialogServiceOperationDigitalBank = new DialogServiceOperationDigitalBank(servicesList);
+            dialogServiceOperationDigitalBank.footer.add(btnSave);
+            dialogServiceOperationDigitalBank.extensionAmount.setValue(accountServiceOperation.getExtensionAmount());
+            dialogServiceOperationDigitalBank.decreaseAmount.setValue(accountServiceOperation.getDecreaseAmount());
+            if(accountServiceOperation.getExtensionAmount()>0) dialogServiceOperationDigitalBank.extensionAmount.setVisible(true);
+            if(accountServiceOperation.getDecreaseAmount()>0) dialogServiceOperationDigitalBank.decreaseAmount.setVisible(true);
+
+            dialogServiceOperationDigitalBank.textArea.setValue(accountServiceOperation.getReasonOpening());
+            dialogServiceOperationDigitalBank.open();
+            btnSave.addClickListener(event -> {
+                try {
+//                    accountServiceOperation.setAccount(String.join(" - ",accountsSelected));
+                    accountServiceOperation.setServices(dialogServiceOperationDigitalBank.getServices());
+                    accountServiceOperation.setExtensionAmount(dialogServiceOperationDigitalBank.extensionAmount.getValue());
+                    accountServiceOperation.setDecreaseAmount(dialogServiceOperationDigitalBank.decreaseAmount.getValue());
+                    accountServiceOperation.setReasonOpening(dialogServiceOperationDigitalBank.textArea.getValue());
+                    Date currentDate = (Date) VaadinSession.getCurrent().getAttribute("current-date");
+                    accountServiceOperation.setCreateDate(Util.formatDate(currentDate,"dd/MM/yyyy"));
+                    accountServiceOperationList.removeIf(f -> f.getId().equals(accountServiceOperation.getId()));
+
+
+                    accountServiceOperationList.add(accountServiceOperation);
+                    dialogServiceOperationDigitalBank.close();
+                    grid.setItems(accountServiceOperationList);
+                    UIUtils.dialog("Cuenta actualizada", "success").open();
+                }catch(Exception e){
+                    UIUtils.dialog("Existe un error, revise los datos", "error").open();
+                }
+            });
         });
 
         return layout;
     }
 
-//    private HorizontalLayout createService(String account){
-//        HorizontalLayout layout = new HorizontalLayout();
-//
-//        return layout;
-//    }
-//
-//    private CheckboxGroup<String> fillCheck(List<Parameter> parameters){
-//        List<String> stringList = new ArrayList<String>();
-//        for(Parameter p: parameters){
-//            stringList.add(p.getName());
-//        }
-//        CheckboxGroup<String> checkboxGroup = new CheckboxGroup<>();
-//        checkboxGroup.setItems(stringList);
-//
-//        return checkboxGroup;
-//    }
 
 
     private void minimise() {
