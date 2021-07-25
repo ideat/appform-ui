@@ -60,6 +60,7 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
 
     private DialogFormSavingBank dialogFormSavingBank;
     private DialogDigitalBanking dialogDigitalBanking;
+    private DialogServiceDebitCard dialogServiceDebitCard;
 
     @Override
     protected void onAttach(AttachEvent attachment){
@@ -204,31 +205,44 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
         if(gbageDto.getAccountName().equals("VARIOS")){
             taskSelect.setItems("BANCA DIGITAL", "ENTREGA TD","SERVICIOS TD", "VERIF. SEGIP" );
             taskSelect.setPlaceholder("Seleccionar Tarea");
+            btnPrint.setVisible(false);
         }else {
             taskSelect.setItems("FORMULARIO APERTURA", "CONTRATO");
             taskSelect.setPlaceholder("Seleccione Tarea");
+            btnPrint.setVisible(true);
         }
+
 
         btnTask.addClickListener(click -> {
             if(!taskSelect.isEmpty()) {
                 if (gbageDto.getAccountName().equals("VARIOS")) {
+
                     if(taskSelect.getValue().equals("BANCA DIGITAL")){
                         openDialog(gbageDto.getGbagecage(),"",  gbageDto.getAccountName(), taskSelect.getValue());
                     }
+                    if(taskSelect.getValue().equals("SERVICIOS TD")){
+                        openDialog(gbageDto.getGbagecage(),"",  gbageDto.getAccountName(), taskSelect.getValue());
+                    }
+
                 } else {
+
                     if (gbageDto.getAccountName().equals("CAJA-AHORRO") || gbageDto.getAccountName().equals("DPF")) {
                         openDialog(gbageDto.getGbagecage(), gbageDto.getAccountCode(), gbageDto.getAccountName(), taskSelect.getValue());
                     }
                 }
             }else{
-                UIUtils.showNotification("Seleccione una tarea a realizar");
+                UIUtils.dialog("Seleccione una tarea","info").open();
             }
         });
 
         btnPrint.addClickListener(click ->{
-           FormReportView report = new FormReportView(gbageDto.getGbagecage(),gbageDto.getAccountCode(),
-                  taskSelect.getValue(), gbageDto.getAccountName(),formsRestTemplate);
-           report.open();
+           if( taskSelect.getValue()!=null && !taskSelect.getValue().isEmpty()) {
+               FormReportView report = new FormReportView(gbageDto.getGbagecage(), gbageDto.getAccountCode(),
+                       taskSelect.getValue(), gbageDto.getAccountName(), formsRestTemplate);
+               report.open();
+           }else{
+               UIUtils.dialog("Seleccione una tarea","info").open();
+           }
         });
 
         HorizontalLayout layout = new HorizontalLayout();
@@ -253,6 +267,12 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
             List<DataFormDto> dataFormDto = formsRestTemplate.findDataFormForDigitalBank(cage);
             dialogDigitalBanking = new DialogDigitalBanking(dataFormDto, parameterList, formsRestTemplate);
             dialogDigitalBanking.open();
+        }else if(categoryTypeForm.equals("VARIOS") && nameTypeForm.equals("SERVICIOS TD")){
+            List<Parameter> parameterList = parameterRestTemplate.findAll();
+
+            List<DataFormDto> dataFormDto = formsRestTemplate.findDataFormForDigitalBank(cage);
+            dialogServiceDebitCard = new DialogServiceDebitCard(dataFormDto,parameterList,formsRestTemplate);
+            dialogServiceDebitCard.open();
         }
 
     }

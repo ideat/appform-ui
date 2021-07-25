@@ -109,7 +109,7 @@ public class DialogFormSavingBank extends Dialog {
 //        Button attachFiles = new Button(VaadinIcon.PAPERCLIP.create());
 
         discardDraft.addThemeVariants(ButtonVariant.LUMO_ERROR,ButtonVariant.LUMO_TERTIARY);
-        footer = new Footer(btnSave,  discardDraft);
+        footer = new Footer(btnSave);
         add(footer);
 
         // Button theming

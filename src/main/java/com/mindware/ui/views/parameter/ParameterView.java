@@ -74,7 +74,7 @@ public class ParameterView extends SplitViewFrame implements RouterLayout {
 
     private TextField txtNameFilter;
 
-    private String[] param = { "BANCA DIGITAL, SERVICIOS", "BANCA DIGITAL, OPERACIONES", "TARJETA DEBITO, SERVICIOS"};
+    private String[] param = { "BANCA DIGITAL, SERVICIOS", "BANCA DIGITAL, OPERACIONES", "TARJETA DEBITO, SERVICIOS","LIMITES BANCA DIGITAL"};
 
     @Override
     protected void onAttach(AttachEvent attachEvent){

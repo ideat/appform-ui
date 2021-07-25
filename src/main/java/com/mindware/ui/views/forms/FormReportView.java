@@ -70,8 +70,11 @@ public class FormReportView extends Dialog  {
 
 
         if(categoryTypeForm.equals("CAJA-AHORRO") || categoryTypeForm.equals("DPF")){
-
             file = restTemplate.report(codeClient,idAccount,typeForm,categoryTypeForm);
+        }else if(categoryTypeForm.equals("VARIOS") && typeForm.equals("BANCA DIGITAL")){
+            file = restTemplate.reportDigitalBank(codeClient,idAccount,typeForm,categoryTypeForm);
+        }else if(categoryTypeForm.equals("VARIOS") && typeForm.equals("SERVICIOS TD")){
+            file = restTemplate.reportDebitCard(codeClient,idAccount,typeForm,categoryTypeForm);
         }
 
         contentReport = (FlexBoxLayout) createContent(createReportView());

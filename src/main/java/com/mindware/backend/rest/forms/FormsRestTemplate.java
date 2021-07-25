@@ -71,7 +71,7 @@ public class FormsRestTemplate {
     }
 
     public Forms findByIdClientAndTypeFormAndCategoryTypeForm(Integer idClient, String nameTypeForm, String categoryTypeForm ){
-        final String uri = url + "/form/findByIdAccountAndTypeFormAndCategoryTypeForm";
+        final String uri = url + "/form/findByIdClientAndTypeFormAndCategoryTypeForm";
 
         HttpHeaders headers = HeaderJwt.getHeader();
         headers.add("id_client",idClient.toString());
@@ -90,6 +90,36 @@ public class FormsRestTemplate {
 
         HttpHeaders headers = HeaderJwt.getHeader();
         headers.add("id_account",idAccount);
+        headers.add("code_client",codeClient.toString());
+        headers.add("category_type_form",categoryTypeForm);
+        headers.add("type_form",typeForm);
+        HttpEntity<byte[]> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<byte[]> response = restTemplate.exchange(uri,HttpMethod.GET,entity,byte[].class);
+
+        return response.getBody();
+    }
+
+    public byte[] reportDigitalBank(Integer codeClient, String idAccountServiceOperation, String typeForm, String categoryTypeForm){
+        final String uri = url + "/form/getFormDigitalBankDtoReport";
+
+        HttpHeaders headers = HeaderJwt.getHeader();
+        headers.add("id_account_service_operation",idAccountServiceOperation);
+        headers.add("code_client",codeClient.toString());
+        headers.add("category_type_form",categoryTypeForm);
+        headers.add("type_form",typeForm);
+        HttpEntity<byte[]> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<byte[]> response = restTemplate.exchange(uri,HttpMethod.GET,entity,byte[].class);
+
+        return response.getBody();
+    }
+
+    public byte[] reportDebitCard(Integer codeClient, String idAccountServiceOperation, String typeForm, String categoryTypeForm){
+        final String uri = url + "/form/getFormDebitCardDtoReport";
+
+        HttpHeaders headers = HeaderJwt.getHeader();
+        headers.add("id_account_service_operation",idAccountServiceOperation);
         headers.add("code_client",codeClient.toString());
         headers.add("category_type_form",categoryTypeForm);
         headers.add("type_form",typeForm);
