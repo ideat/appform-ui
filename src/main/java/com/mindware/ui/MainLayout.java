@@ -6,6 +6,7 @@ import com.mindware.backend.entity.netbank.dto.AdusrOfi;
 import com.mindware.backend.rest.netbank.AdusrOfiRestTemplate;
 import com.mindware.backend.rest.netbank.GbpmtRestTemplate;
 import com.mindware.ui.views.forms.FormSearchView;
+import com.mindware.ui.views.forms.FormVerifyIdCard;
 import com.mindware.ui.views.login.LoginView;
 import com.mindware.ui.views.parameter.ParameterView;
 import com.vaadin.flow.component.Component;
@@ -144,6 +145,7 @@ public class MainLayout extends FlexBoxLayout
 	private void initNaviItems() {
 		NaviMenu menu = naviDrawer.getMenu();
 		menu.addNaviItem(VaadinIcon.FILE, "Formularios", FormSearchView.class);
+		menu.addNaviItem(VaadinIcon.FILE, "Verif. C.I.", FormVerifyIdCard.class);
 		NaviItem personnel = menu.addNaviItem(VaadinIcon.STOP_COG, "Configuracion",
 				null);
 		menu.addNaviItem(personnel, "Parametros", ParameterView.class);

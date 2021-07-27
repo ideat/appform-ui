@@ -235,6 +235,9 @@ public class DialogFormSavingBank extends Dialog {
         TextField documentClientVinculation = new TextField();
         documentClientVinculation.setWidthFull();
 
+        TextField sourceFounds = new TextField();
+        sourceFounds.setWidthFull();
+
         FormLayout formAccount = new FormLayout();
         formAccount.setSizeUndefined();
         formAccount.setResponsiveSteps(
@@ -294,6 +297,9 @@ public class DialogFormSavingBank extends Dialog {
                 .bind(Forms::getNameClientVinculation,Forms::setNameClientVinculation);
         binder.forField(documentClientVinculation)
                 .bind(Forms::getDocumentClientVinculation,Forms::setDocumentClientVinculation);
+        binder.forField(sourceFounds)
+                .asRequired("Origen de fondos es requerido")
+                .bind(Forms::getSourceFounds,Forms::setSourceFounds);
 
         formAccount.addFormItem(product,"Producto");
         formAccount.addFormItem(currency,"Moneda");
@@ -416,7 +422,7 @@ public class DialogFormSavingBank extends Dialog {
 
         FormLayout.FormItem layoutItem = formAccount.addFormItem(layout,"Usted es el Beneficiario Final?");
         UIUtils.setColSpan(1,layoutItem);
-
+        formAccount.addFormItem(sourceFounds,"Origen de fondos");
         return formAccount;
     }
 

@@ -227,10 +227,10 @@ public class DialogServiceDebitCard extends Dialog {
                         UIUtils.dialog("Debe indicar un texto referente a los motivos del servicio solicitado", "alert").open();
                         return;
                     }
-                    if (dialogCreateDebitCard.servicesSelected.isEmpty()) {
-                        UIUtils.dialog("Debe seleccionar un servicio", "alert").open();
-                        return;
-                    }
+//                    if (dialogCreateDebitCard.servicesSelected.isEmpty()) {
+//                        UIUtils.dialog("Debe seleccionar un servicio", "alert").open();
+//                        return;
+//                    }
                     AccountServiceOperation accountServiceOperation = new AccountServiceOperation();
                     accountServiceOperation.setId(UUID.randomUUID().toString());
 
@@ -301,12 +301,16 @@ public class DialogServiceDebitCard extends Dialog {
         btnEdit.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_SUCCESS);
         btnEdit.setIcon(VaadinIcon.FILE_REFRESH.create());
 
-        Button btnPrint = new Button();
+        Button btnPrint = new Button("Servicios");
         btnPrint.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_CONTRAST);
         btnPrint.setIcon(VaadinIcon.PRINT.create());
 
+        Button btnPrintDeliver = new Button("Entrega");
+        btnPrintDeliver.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_CONTRAST);
+        btnPrintDeliver.setIcon(VaadinIcon.PRINT.create());
+
         HorizontalLayout layout = new HorizontalLayout();
-        layout.add(btnEdit,btnPrint);
+        layout.add(btnEdit,btnPrint,btnPrintDeliver);
 
         btnEdit.addClickListener(event -> {
             fillRegisteredServicesAndOperations(accountServiceOperation.getServices());
@@ -321,8 +325,10 @@ public class DialogServiceDebitCard extends Dialog {
             dialogCreateDebitCard.extensionAmount.setValue(accountServiceOperation.getExtensionAmount()!=null?accountServiceOperation.getExtensionAmount():0.0);
             dialogCreateDebitCard.decreaseAmount.setValue(accountServiceOperation.getDecreaseAmount()!=null?accountServiceOperation.getDecreaseAmount():0.0);
             dialogCreateDebitCard.numberDebitCard.setValue(accountServiceOperation.getAccount());
-            if(accountServiceOperation.getExtensionAmount()!=null && accountServiceOperation.getExtensionAmount()>0) dialogCreateDebitCard.extensionAmount.setVisible(true);
-            if(accountServiceOperation.getDecreaseAmount()!=null && accountServiceOperation.getDecreaseAmount()>0) dialogCreateDebitCard.decreaseAmount.setVisible(true);
+            if(accountServiceOperation.getExtensionAmount()!=null && accountServiceOperation.getExtensionAmount()>0)
+                dialogCreateDebitCard.extensionAmount.setVisible(true);
+            if(accountServiceOperation.getDecreaseAmount()!=null && accountServiceOperation.getDecreaseAmount()>0)
+                dialogCreateDebitCard.decreaseAmount.setVisible(true);
 
             dialogCreateDebitCard.textArea.setValue(accountServiceOperation.getReasonOpening());
             dialogCreateDebitCard.cmbAccountSavingBank.setValue(accountServiceOperation.getAccountSavingBank());
@@ -351,8 +357,38 @@ public class DialogServiceDebitCard extends Dialog {
 
         btnPrint.addClickListener(click -> {
             FormReportView report = new FormReportView(formsDebitCard.getIdClient(),accountServiceOperation.getId(),
-                    formsDebitCard.getNameTypeForm(),formsDebitCard.getCategoryTypeForm(),formsRestTemplateGlobal);
+                    formsDebitCard.getNameTypeForm(),formsDebitCard.getCategoryTypeForm(),formsRestTemplateGlobal,"","");
             report.open();
+        });
+
+        btnPrintDeliver.addClickListener(click -> {
+            if(formsDebitCard.getId()!=null) {
+                if ( accountServiceOperation.getDeliverDate()==null || accountServiceOperation.getDeliverDate().isEmpty() || accountServiceOperation.getDeliverDate().equals("null")) {
+                    Date currentDate = (Date) VaadinSession.getCurrent().getAttribute("current-date");
+                    accountServiceOperation.setDeliverDate(Util.formatDate(currentDate, "dd/MM/yyyy"));
+                    accountServiceOperationList.removeIf(f -> f.getId().equals(accountServiceOperation.getId()));
+                    accountServiceOperationList.add(accountServiceOperation);
+                    ObjectMapper mapper = new ObjectMapper();
+                    try {
+                        String op = mapper.writeValueAsString(accountServiceOperationList);
+                        formsDebitCard.setAccountServiceOperation(op);
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
+
+                    formsRestTemplateGlobal.create(formsDebitCard);
+                    UIUtils.showNotification("Preparando reporte");
+
+
+                }
+            }else{
+                UIUtils.dialog("Registre la tarjeta guardando los cambios","alert").open();
+                return;
+            }
+            FormReportView report = new FormReportView(formsDebitCard.getIdClient(),accountServiceOperation.getId(),
+                    formsDebitCard.getNameTypeForm(),formsDebitCard.getCategoryTypeForm(),formsRestTemplateGlobal,"DELIVER","");
+            report.open();
+
         });
 
         return layout;

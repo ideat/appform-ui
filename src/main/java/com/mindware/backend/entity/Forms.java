@@ -3,6 +3,8 @@ package com.mindware.backend.entity;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 
 @Getter
@@ -68,6 +70,16 @@ public class Forms {
     private String accountServiceOperation; //json
 
     private String userDigitalBank;
+
+    private String sourceFounds;
+
+    public LocalDate getCreationDateConverter(){
+        if(creationDate!=null) {
+            return creationDate.toInstant()
+                    .atZone(ZoneId.of("UTC"))
+                    .toLocalDate();
+        }return null;
+    }
 }
 
 

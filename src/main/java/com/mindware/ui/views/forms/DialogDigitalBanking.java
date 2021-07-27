@@ -383,7 +383,7 @@ public class DialogDigitalBanking extends Dialog {
 
         btnPrint.addClickListener(click -> {
             FormReportView report = new FormReportView(formsDigitalBank.getIdClient(),accountServiceOperation.getId(),
-                    formsDigitalBank.getNameTypeForm(),formsDigitalBank.getCategoryTypeForm(),formsRestTemplateGlobal);
+                    formsDigitalBank.getNameTypeForm(),formsDigitalBank.getCategoryTypeForm(),formsRestTemplateGlobal,"","");
             report.open();
         });
 

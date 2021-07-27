@@ -9,6 +9,8 @@ public class AccountServiceOperation {
 
     private String createDate;
 
+    private String deliverDate;
+
     private String hourCreate;
 
     private String account;

@@ -194,7 +194,7 @@ public class DialogCreateDebitCard extends Dialog {
         layout2.add(extensionAmount, decreaseAmount);
 
         HorizontalLayout layout = new HorizontalLayout();
-        layout.setWidth("80%");
+        layout.setWidth("90%");
         layout.add( checkboxGroupService, layout2);
 
         return layout;

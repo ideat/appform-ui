@@ -70,6 +70,37 @@ public class FormsRestTemplate {
 
     }
 
+    public List<Forms> findByUserTypeFormAndCategoryTypeForm(String idUser, String nameTypeForm, String categoryTypeForm ){
+        final String uri = url + "/form/findByUserTypeFormAndCategoryTypeForm";
+
+        HttpHeaders headers = HeaderJwt.getHeader();
+        headers.add("user",idUser);
+        headers.add("name_type_form",nameTypeForm);
+        headers.add("category_type_form",categoryTypeForm);
+        HttpEntity<Forms> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<Forms[]> response = restTemplate.exchange(uri,HttpMethod.GET,entity,Forms[].class);
+
+        return Arrays.asList(response.getBody());
+
+    }
+
+    public List<Forms> findByTypeFormAndCategoryTypeForm( String nameTypeForm, String categoryTypeForm ){
+        final String uri = url + "/form/findByTypeFormAndCategoryTypeForm";
+
+        HttpHeaders headers = HeaderJwt.getHeader();
+        headers.add("name_type_form",nameTypeForm);
+        headers.add("category_type_form",categoryTypeForm);
+        HttpEntity<Forms> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<Forms[]> response = restTemplate.exchange(uri,HttpMethod.GET,entity,Forms[].class);
+
+        return Arrays.asList(response.getBody());
+
+    }
+
+
+
     public Forms findByIdClientAndTypeFormAndCategoryTypeForm(Integer idClient, String nameTypeForm, String categoryTypeForm ){
         final String uri = url + "/form/findByIdClientAndTypeFormAndCategoryTypeForm";
 
@@ -129,4 +160,34 @@ public class FormsRestTemplate {
 
         return response.getBody();
     }
+
+    public byte[] reportDeliverDebitCard(Integer codeClient, String idAccountServiceOperation, String typeForm, String categoryTypeForm){
+        final String uri = url + "/form/getFormDeliverDebitCardReport";
+
+        HttpHeaders headers = HeaderJwt.getHeader();
+        headers.add("id_account_service_operation",idAccountServiceOperation);
+        headers.add("code_client",codeClient.toString());
+        headers.add("category_type_form",categoryTypeForm);
+        headers.add("type_form",typeForm);
+        HttpEntity<byte[]> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<byte[]> response = restTemplate.exchange(uri,HttpMethod.GET,entity,byte[].class);
+
+        return response.getBody();
+    }
+
+    public byte[] reportVerificationIdtCard(String id, String login){
+        final String uri = url + "/form/getFormVerifyIdCardDtoReport";
+
+        HttpHeaders headers = HeaderJwt.getHeader();
+        headers.add("id",id);
+        headers.add("login",login);
+        HttpEntity<byte[]> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<byte[]> response = restTemplate.exchange(uri,HttpMethod.GET,entity,byte[].class);
+
+        return response.getBody();
+    }
+
+
 }

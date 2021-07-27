@@ -95,7 +95,7 @@ public class ParameterView extends SplitViewFrame implements RouterLayout {
     }
 
     private void getListParameter(){
-        String paramStr = Arrays.asList(param).stream().collect(Collectors.joining(","));;
+//        String paramStr = Arrays.asList(param).stream().collect(Collectors.joining(","));
         parameterList = new ArrayList<>(restTemplate.findAll());
         dataProvider = new ListDataProvider<>(parameterList);
     }

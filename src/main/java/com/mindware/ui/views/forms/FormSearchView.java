@@ -203,7 +203,7 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
 
         Select<String> taskSelect = new Select<>();
         if(gbageDto.getAccountName().equals("VARIOS")){
-            taskSelect.setItems("BANCA DIGITAL", "ENTREGA TD","SERVICIOS TD", "VERIF. SEGIP" );
+            taskSelect.setItems("BANCA DIGITAL", "SERVICIOS TD", "VERIF. SEGIP" );
             taskSelect.setPlaceholder("Seleccionar Tarea");
             btnPrint.setVisible(false);
         }else {
@@ -238,7 +238,7 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
         btnPrint.addClickListener(click ->{
            if( taskSelect.getValue()!=null && !taskSelect.getValue().isEmpty()) {
                FormReportView report = new FormReportView(gbageDto.getGbagecage(), gbageDto.getAccountCode(),
-                       taskSelect.getValue(), gbageDto.getAccountName(), formsRestTemplate);
+                       taskSelect.getValue(), gbageDto.getAccountName(), formsRestTemplate,"","");
                report.open();
            }else{
                UIUtils.dialog("Seleccione una tarea","info").open();
@@ -262,17 +262,25 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
                     dataFormDto, formsRestTemplate, gbageLabDtoRestTemplate);
             dialogFormSavingBank.open();
         }else if(categoryTypeForm.equals("VARIOS") && nameTypeForm.equals("BANCA DIGITAL")){
-            List<Parameter> parameterList = parameterRestTemplate.findAll();
+            try {
+                List<Parameter> parameterList = parameterRestTemplate.findAll();
 
-            List<DataFormDto> dataFormDto = formsRestTemplate.findDataFormForDigitalBank(cage);
-            dialogDigitalBanking = new DialogDigitalBanking(dataFormDto, parameterList, formsRestTemplate);
-            dialogDigitalBanking.open();
+                List<DataFormDto> dataFormDto = formsRestTemplate.findDataFormForDigitalBank(cage);
+                dialogDigitalBanking = new DialogDigitalBanking(dataFormDto, parameterList, formsRestTemplate);
+                dialogDigitalBanking.open();
+            }catch (Exception e) {
+                UIUtils.dialog(e.getMessage(),"alert").open();
+            }
         }else if(categoryTypeForm.equals("VARIOS") && nameTypeForm.equals("SERVICIOS TD")){
-            List<Parameter> parameterList = parameterRestTemplate.findAll();
+            try {
+                List<Parameter> parameterList = parameterRestTemplate.findAll();
 
-            List<DataFormDto> dataFormDto = formsRestTemplate.findDataFormForDigitalBank(cage);
-            dialogServiceDebitCard = new DialogServiceDebitCard(dataFormDto,parameterList,formsRestTemplate);
-            dialogServiceDebitCard.open();
+                List<DataFormDto> dataFormDto = formsRestTemplate.findDataFormForDigitalBank(cage);
+                dialogServiceDebitCard = new DialogServiceDebitCard(dataFormDto, parameterList, formsRestTemplate);
+                dialogServiceDebitCard.open();
+            }catch (Exception e) {
+                UIUtils.dialog(e.getMessage(),"alert").open();
+            }
         }
 
     }

@@ -21,6 +21,7 @@ import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.theme.lumo.Lumo;
 
 import java.io.ByteArrayInputStream;
+import java.util.Optional;
 
 @CssImport("./styles/my-dialog.css")
 public class FormReportView extends Dialog  {
@@ -38,7 +39,8 @@ public class FormReportView extends Dialog  {
     private FlexBoxLayout contentReport;
 
 
-    public FormReportView(Integer codeClient, String idAccount, String typeForm, String categoryTypeForm, FormsRestTemplate restTemplate){
+    public FormReportView(Integer codeClient, String idAccount, String typeForm,
+                          String categoryTypeForm, FormsRestTemplate restTemplate, String others, String login){
         setDraggable(true);
         setModal(false);
         setResizable(true);
@@ -74,7 +76,13 @@ public class FormReportView extends Dialog  {
         }else if(categoryTypeForm.equals("VARIOS") && typeForm.equals("BANCA DIGITAL")){
             file = restTemplate.reportDigitalBank(codeClient,idAccount,typeForm,categoryTypeForm);
         }else if(categoryTypeForm.equals("VARIOS") && typeForm.equals("SERVICIOS TD")){
-            file = restTemplate.reportDebitCard(codeClient,idAccount,typeForm,categoryTypeForm);
+            if(others.equals("DELIVER")){
+                file = restTemplate.reportDeliverDebitCard(codeClient, idAccount, typeForm, categoryTypeForm);
+            }else {
+                file = restTemplate.reportDebitCard(codeClient, idAccount, typeForm, categoryTypeForm);
+            }
+        }else if(categoryTypeForm.equals("VARIOS") && typeForm.equals("VERIF. SEGIP")){
+            file = restTemplate.reportVerificationIdtCard(others,login);
         }
 
         contentReport = (FlexBoxLayout) createContent(createReportView());
