@@ -117,9 +117,9 @@ public class AppBar extends FlexBoxLayout {
 
 		ContextMenu contextMenu = new ContextMenu(avatar);
 		contextMenu.setOpenOnClick(true);
-		contextMenu.addItem("Settings",
-				e -> Notification.show("Not implemented yet.", 3000,
-						Notification.Position.BOTTOM_CENTER));
+//		contextMenu.addItem("Settings",
+//				e -> Notification.show("Not implemented yet.", 3000,
+//						Notification.Position.BOTTOM_CENTER));
 		contextMenu.addItem("Cerrar sesion",
 				e -> {
 					UI.getCurrent().navigate("login");

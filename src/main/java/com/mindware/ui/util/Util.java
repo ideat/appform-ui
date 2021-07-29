@@ -8,6 +8,7 @@ import lombok.SneakyThrows;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Random;
 
 public class Util {
 
@@ -49,5 +50,38 @@ public class Util {
         public String convertToPresentation(Integer integer, ValueContext valueContext) {
             return integer.toString();
         }
+    }
+
+    public static class DoubleToIntegerConverter implements Converter<Double, Integer> {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public Result<Integer> convertToModel(Double presentation, ValueContext valueContext) {
+            return Result.ok(presentation.intValue());
+        }
+
+        @Override
+        public Double convertToPresentation(Integer model, ValueContext valueContext) {
+            return model == null?0.0:model.doubleValue();
+        }
+
+    }
+
+
+
+    public static String generateRandomPassword(){
+        Random random = new Random();
+        int leftLimit = 48; // numeral '0'
+        int rightLimit = 122; // letter 'z'
+        int targetStringLength = 10;
+
+        String generatedString = random.ints(leftLimit, rightLimit + 1)
+                .filter(i -> (i <= 57 || i >= 65) && (i <= 90 || i >= 97))
+                .limit(targetStringLength)
+                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString();
+
+        return generatedString;
     }
 }

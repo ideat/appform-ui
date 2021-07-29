@@ -1,14 +1,19 @@
 package com.mindware.ui;
 
 import com.mindware.backend.entity.Options;
-import com.mindware.backend.entity.netbank.Gbpmt;
-import com.mindware.backend.entity.netbank.dto.AdusrOfi;
-import com.mindware.backend.rest.netbank.AdusrOfiRestTemplate;
-import com.mindware.backend.rest.netbank.GbpmtRestTemplate;
+import com.mindware.ui.components.FlexBoxLayout;
+import com.mindware.ui.components.navigation.bar.AppBar;
+import com.mindware.ui.components.navigation.bar.TabBar;
+import com.mindware.ui.components.navigation.drawer.NaviDrawer;
+import com.mindware.ui.components.navigation.drawer.NaviItem;
+import com.mindware.ui.components.navigation.drawer.NaviMenu;
+import com.mindware.ui.util.UIUtils;
+import com.mindware.ui.util.css.Overflow;
+import com.mindware.ui.views.Home;
 import com.mindware.ui.views.forms.FormSearchView;
 import com.mindware.ui.views.forms.FormVerifyIdCard;
-import com.mindware.ui.views.login.LoginView;
 import com.mindware.ui.views.parameter.ParameterView;
+import com.mindware.ui.views.users.UserView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasElement;
 import com.vaadin.flow.component.UI;
@@ -23,25 +28,9 @@ import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLayout;
 import com.vaadin.flow.server.*;
-import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.lumo.Lumo;
-import com.mindware.ui.components.FlexBoxLayout;
-import com.mindware.ui.components.navigation.bar.AppBar;
-import com.mindware.ui.components.navigation.bar.TabBar;
-import com.mindware.ui.components.navigation.drawer.NaviDrawer;
-import com.mindware.ui.components.navigation.drawer.NaviItem;
-import com.mindware.ui.components.navigation.drawer.NaviMenu;
-import com.mindware.ui.util.UIUtils;
-import com.mindware.ui.util.css.Overflow;
-import com.mindware.ui.views.Accounts;
-import com.mindware.ui.views.Home;
-import com.mindware.ui.views.Payments;
-import com.mindware.ui.views.Statistics;
-import com.mindware.ui.views.personnel.Accountants;
-import com.mindware.ui.views.personnel.Managers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -146,10 +135,12 @@ public class MainLayout extends FlexBoxLayout
 		NaviMenu menu = naviDrawer.getMenu();
 		menu.addNaviItem(VaadinIcon.FILE, "Formularios", FormSearchView.class);
 		menu.addNaviItem(VaadinIcon.FILE, "Verif. C.I.", FormVerifyIdCard.class);
-		NaviItem personnel = menu.addNaviItem(VaadinIcon.STOP_COG, "Configuracion",
-				null);
-		menu.addNaviItem(personnel, "Parametros", ParameterView.class);
-		menu.addNaviItem(personnel, "Usuarios", Home.class);
+		if(VaadinSession.getCurrent().getAttribute("rol").toString().equals("ADMINISTRADOR")) {
+			NaviItem personnel = menu.addNaviItem(VaadinIcon.STOP_COG, "Configuracion",
+					null);
+			menu.addNaviItem(personnel, "Parametros", ParameterView.class);
+			menu.addNaviItem(personnel, "Usuarios", UserView.class);
+		}
 
 	}
 

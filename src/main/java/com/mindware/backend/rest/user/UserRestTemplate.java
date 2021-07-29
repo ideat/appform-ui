@@ -4,13 +4,15 @@ import com.mindware.backend.entity.Users;
 import com.mindware.backend.util.HeaderJwt;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class UserRestTemplate {
@@ -35,7 +37,8 @@ public class UserRestTemplate {
 
     public void updatePassword(Users users){
         final String uri = url+"/user/updatePassword";
-        HttpEntity<Users> entity = new HttpEntity<>(users,HeaderJwt.getHeader());
+//        HttpEntity<Users> entity = new HttpEntity<>(users,HeaderJwt.getHeader());
+        HttpEntity<Users> entity = new HttpEntity<>(users);
         restTemplate.put(uri,entity);
     }
 
@@ -45,16 +48,6 @@ public class UserRestTemplate {
         HttpEntity<Users> entity = new HttpEntity<>(users,HeaderJwt.getHeader());
         restTemplate.put(uri,entity);
     }
-
-//    public Users findById(UUID id){
-//        final String uri = "http://localhost:8080/rest/user/v1/getById/{id}";
-//        Map<String,UUID> params = new HashMap<>();
-//        params.put("id",id);
-//        HttpEntity<Users> entity = new HttpEntity<>(HeaderJwt.getHeader());
-//        ResponseEntity<Users> response = restTemplate.exchange(uri, HttpMethod.GET,entity,Users.class,params);
-//
-//        return response.getBody();
-//    }
 
     public Users findByLogin(String login){
         final String uri = url+"/user/findByLogin/{login}";

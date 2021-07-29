@@ -9,6 +9,8 @@ import com.mindware.backend.rest.login.Token;
 import com.mindware.backend.rest.netbank.AdusrOfiRestTemplate;
 import com.mindware.backend.rest.netbank.GbpmtRestTemplate;
 import com.mindware.backend.rest.user.UserRestTemplate;
+import com.mindware.ui.util.UIUtils;
+import com.mindware.ui.views.users.DialogUpdatePassword;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.login.LoginI18n;
@@ -17,12 +19,10 @@ import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.server.VaadinSession;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Route("")
 @RouteAlias("login")
@@ -46,6 +46,9 @@ public class LoginView extends VerticalLayout {
 //        userRestTemplate = new UserRestTemplate();
         LoginForm component = new LoginForm();
         component.setI18n(createSpanishI18n());
+        component.addLoginListener(e -> {
+
+        });
 
         component.addLoginListener(e ->{
             JwtRequest jwtRequest = new JwtRequest();
@@ -55,24 +58,35 @@ public class LoginView extends VerticalLayout {
                 Token token = restTemplate.getToken(jwtRequest);
                 String loginUser = e.getUsername().toUpperCase();
                 VaadinSession.getCurrent().setAttribute("jwt", token.getToken());
-                VaadinSession.getCurrent().setAttribute("login",loginUser);
+
                 Users users = userRestTemplate.findByLogin(loginUser);
                 AdusrOfi adusrOfi = adusrOfiRestTemplate.findByLogin(loginUser);
                 Gbpmt gbpmt = gbpmtRestTemplate.findAll();
+                VaadinSession.getCurrent().setAttribute("jwt", null);
 
-                VaadinSession.getCurrent().setAttribute("type-change", gbpmt.getGbpmttcof());
-                VaadinSession.getCurrent().setAttribute("name-office",adusrOfi.getGbofides1());
-                VaadinSession.getCurrent().setAttribute("current-date",gbpmt.getGbpmtfdia());
+                if(users.getState().equals("ACTIVO")) {
+                    if(adusrOfi==null){
+                        UIUtils.dialog("La cuenta de usuario no existe en el core finenciero","alert").open();
+                        return;
+                    }
+                    if(isCurrentPassword(users, gbpmt.getGbpmtfdia())==true){
+                        VaadinSession.getCurrent().setAttribute("jwt", token.getToken());
+                        VaadinSession.getCurrent().setAttribute("login",loginUser);
+                        VaadinSession.getCurrent().setAttribute("type-change", gbpmt.getGbpmttcof());
+                        VaadinSession.getCurrent().setAttribute("name-office",adusrOfi.getGbofides1());
+                        VaadinSession.getCurrent().setAttribute("current-date",gbpmt.getGbpmtfdia());
+                        VaadinSession.getCurrent().setAttribute("rol",users.getRolName());
+                        VaadinSession.getCurrent().setAttribute("email",users.getEmail());
 
-                if(users.getState().equals("active")) {
-                    UI.getCurrent().navigate("main");
+                        UI.getCurrent().navigate("main");
+                    }else{
+                        DialogUpdatePassword dialogUpdatePassword = new DialogUpdatePassword(userRestTemplate,users);
+                        dialogUpdatePassword.open();
+                    }
+
                 }else if(users.getState().equals("RESET")){
-                    Map<String, List<String>> param = new HashMap<>();
-                    List<String> login = new ArrayList<>();
-                    login.add(loginUser);
-                    param.put("login",login);
-                    QueryParameters qp = new QueryParameters(param);
-                    UI.getCurrent().navigate("user-update-password",qp);
+                    DialogUpdatePassword dialogUpdatePassword = new DialogUpdatePassword(userRestTemplate,users);
+                    dialogUpdatePassword.open();
                 }
             }catch (Exception ex){
                 component.setError(true);
@@ -84,6 +98,20 @@ public class LoginView extends VerticalLayout {
         getStyle().set("align-center","stretch");
         setHorizontalComponentAlignment(Alignment.CENTER,component);
         add(component);
+    }
+
+    private Boolean isCurrentPassword(Users user, Date currentDate){
+        if(user.getDateUpdatePassword()!=null){
+            Date dateForReset = DateUtils.addDays(user.getDateUpdatePassword(),user.getNumDaysValidity()) ;
+            if(dateForReset.after(currentDate) ){
+                return true;
+            } return false;
+        }else {
+            Date dateForReset = DateUtils.addDays(user.getCreateDate(),user.getNumDaysValidity()) ;
+            if(dateForReset.after(currentDate) ){
+                return true;
+            } return false;
+        }
     }
 
     private LoginI18n createSpanishI18n() {

@@ -27,4 +27,18 @@ public class Users {
 
     private String state;
 
+    private Date createDate;
+
+    public String getInitials(){
+        if(fullName!=null) {
+            String[] arr = fullName.split(" ");
+            if(arr.length == 1){
+                return (arr[0].substring(0,2)).toUpperCase();
+            }else {
+                return (arr[0].substring(0,1) + arr[1].substring(0,1)).toUpperCase();
+            }
+        }
+        return "N/A";
+    }
+
 }

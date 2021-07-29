@@ -1,6 +1,7 @@
 package com.mindware.ui.util;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -9,6 +10,7 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
@@ -17,6 +19,7 @@ import com.mindware.backend.DummyData;
 import com.mindware.ui.components.FlexBoxLayout;
 import com.mindware.ui.layout.size.Right;
 import com.mindware.ui.util.css.*;
+import com.vaadin.flow.theme.lumo.Lumo;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -303,6 +306,20 @@ public class UIUtils {
 		FlexBoxLayout layout = new FlexBoxLayout(prefix, number);
 		layout.setFlexGrow(1, number);
 		layout.setSpacing(Right.S);
+		return layout;
+	}
+
+	public static Component createInitials(String initials) {
+		FlexBoxLayout layout = new FlexBoxLayout(new Text(initials));
+		setFontSize(FontSize.S, layout);
+		layout.addClassName("initials");
+
+		layout.setAlignItems(FlexComponent.Alignment.CENTER);
+		layout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+		layout.setTheme(Lumo.DARK);
+
+		layout.setHeight(LumoStyles.Size.M);
+		layout.setWidth(LumoStyles.Size.M);
 		return layout;
 	}
 

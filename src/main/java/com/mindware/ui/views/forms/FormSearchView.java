@@ -203,7 +203,7 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
 
         Select<String> taskSelect = new Select<>();
         if(gbageDto.getAccountName().equals("VARIOS")){
-            taskSelect.setItems("BANCA DIGITAL", "SERVICIOS TD", "VERIF. SEGIP" );
+            taskSelect.setItems("BANCA DIGITAL", "SERVICIOS TD" );
             taskSelect.setPlaceholder("Seleccionar Tarea");
             btnPrint.setVisible(false);
         }else {
