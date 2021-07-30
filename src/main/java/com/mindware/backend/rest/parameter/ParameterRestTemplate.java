@@ -28,6 +28,14 @@ public class ParameterRestTemplate {
         return Arrays.asList(response.getBody());
     }
 
+    public List<Parameter> findAllActive() {
+        final String uri = url+"/parameter/findAllActive";
+        HttpEntity<Parameter[]> entity = new HttpEntity<>(HeaderJwt.getHeader());
+        ResponseEntity<Parameter[]> response = restTemplate.exchange(uri, HttpMethod.GET,entity,Parameter[].class);
+
+        return Arrays.asList(response.getBody());
+    }
+
     public Parameter create(Parameter parameter){
         final String uri = url+"/parameter/create";
         HttpEntity<Parameter> entity = new HttpEntity<>(parameter, HeaderJwt.getHeader());

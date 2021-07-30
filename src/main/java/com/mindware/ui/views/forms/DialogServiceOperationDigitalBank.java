@@ -123,14 +123,25 @@ public class DialogServiceOperationDigitalBank extends Dialog {
 
     public String getServices()  {
         List<Service> serviceState = new ArrayList<>();
+        List<Service> auxService = new ArrayList<>();
+        List<Service> auxOperation = new ArrayList<>();
+
+        for(Service s: serviceListGlobal){
+                s.setChecked("NO");
+                auxService.add(s);
+        }
+        for(Service s: operationListGlobal){
+            s.setChecked("NO");
+            auxOperation.add(s);
+        }
 
         for(String s:servicesSelected){
-            Service service = serviceListGlobal.stream()
+            Service service = auxService.stream()
                     .filter(f -> f.getName().equals(s))
                     .collect(Collectors.toList()).get(0);
             service.setChecked("SI");
-            serviceListGlobal.removeIf(d -> d.getName().equals(s));
-            serviceListGlobal.add(service);
+            auxService.removeIf(d -> d.getName().equals(s));
+            auxService.add(service);
         }
 
         for(String s:operationsSelected){
@@ -138,9 +149,11 @@ public class DialogServiceOperationDigitalBank extends Dialog {
                     .filter(f -> f.getName().equals(s))
                     .collect(Collectors.toList()).get(0);
             service.setChecked("SI");
-            operationListGlobal.removeIf(d -> d.getName().equals(s));
-            operationListGlobal.add(service);
+            auxOperation.removeIf(d -> d.getName().equals(s));
+            auxOperation.add(service);
         }
+        serviceListGlobal = auxService;
+        operationListGlobal = auxOperation;
 
         serviceState.addAll(serviceListGlobal);
         serviceState.addAll(operationListGlobal);

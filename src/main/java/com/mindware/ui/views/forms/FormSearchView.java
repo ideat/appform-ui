@@ -263,7 +263,7 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
             dialogFormSavingBank.open();
         }else if(categoryTypeForm.equals("VARIOS") && nameTypeForm.equals("BANCA DIGITAL")){
             try {
-                List<Parameter> parameterList = parameterRestTemplate.findAll();
+                List<Parameter> parameterList = parameterRestTemplate.findAllActive();
 
                 List<DataFormDto> dataFormDto = formsRestTemplate.findDataFormForDigitalBank(cage);
                 dialogDigitalBanking = new DialogDigitalBanking(dataFormDto, parameterList, formsRestTemplate);
@@ -273,7 +273,7 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
             }
         }else if(categoryTypeForm.equals("VARIOS") && nameTypeForm.equals("SERVICIOS TD")){
             try {
-                List<Parameter> parameterList = parameterRestTemplate.findAll();
+                List<Parameter> parameterList = parameterRestTemplate.findAllActive();
 
                 List<DataFormDto> dataFormDto = formsRestTemplate.findDataFormForDigitalBank(cage);
                 dialogServiceDebitCard = new DialogServiceDebitCard(dataFormDto, parameterList, formsRestTemplate);

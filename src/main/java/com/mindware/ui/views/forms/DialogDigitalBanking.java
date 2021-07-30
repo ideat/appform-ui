@@ -48,7 +48,7 @@ public class DialogDigitalBanking extends Dialog {
     private Header header;
     private Button min;
     private Button max;
-    private Button btnSave;
+    private Button btnClose;
 //    private Button discardDraft;
 
     private VerticalLayout content;
@@ -71,6 +71,7 @@ public class DialogDigitalBanking extends Dialog {
     private Grid<AccountServiceOperation> grid;
 
     private FormsRestTemplate formsRestTemplateGlobal;
+    private DataFormDto dataFormDto;
 
     public DialogDigitalBanking(List<DataFormDto> dataFormDto, List<Parameter> parameterList, FormsRestTemplate formsRestTemplate)  {
 
@@ -111,7 +112,7 @@ public class DialogDigitalBanking extends Dialog {
         header.getElement().getThemeList().add(Lumo.DARK);
         add(header);
 
-        btnSave = new Button("Guardar");
+        btnClose = new Button("Cerrar");
 //        discardDraft = new Button(VaadinIcon.TRASH.create());
         // Content
 
@@ -128,12 +129,12 @@ public class DialogDigitalBanking extends Dialog {
 
         // Footer
 
-        btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        btnClose.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_CONTRAST);
 
 //        Button attachFiles = new Button(VaadinIcon.PAPERCLIP.create());
 
 //        discardDraft.addThemeVariants(ButtonVariant.LUMO_ERROR,ButtonVariant.LUMO_TERTIARY);
-        footer = new Footer(btnSave);
+        footer = new Footer(btnClose);
         add(footer);
 
         // Button theming
@@ -142,24 +143,25 @@ public class DialogDigitalBanking extends Dialog {
         }
         maximise();
 
-        btnSave.addClickListener(event -> {
-           if(binderForms.writeBeanIfValid(formsDigitalBank)){
-               formsDigitalBank.setCategoryTypeForm("VARIOS");
-               formsDigitalBank.setNameTypeForm("BANCA DIGITAL");
-               formsDigitalBank.setIdClient(dataFormDto.get(0).getCodeClient());
-               formsDigitalBank.setIdUser(VaadinSession.getCurrent().getAttribute("login").toString());
-               ObjectMapper mapper = new ObjectMapper();
-               try {
-                   String op = mapper.writeValueAsString(accountServiceOperationList);
-                   formsDigitalBank.setAccountServiceOperation(op);
-               } catch (JsonProcessingException e) {
-                   e.printStackTrace();
-               }
-
-               formsRestTemplate.create(formsDigitalBank);
-               UIUtils.dialog("Formulario registrado","success").open();
-               close();
-           }
+        btnClose.addClickListener(event -> {
+            close();
+//           if(binderForms.writeBeanIfValid(formsDigitalBank)){
+//               formsDigitalBank.setCategoryTypeForm("VARIOS");
+//               formsDigitalBank.setNameTypeForm("BANCA DIGITAL");
+//               formsDigitalBank.setIdClient(dataFormDto.get(0).getCodeClient());
+//               formsDigitalBank.setIdUser(VaadinSession.getCurrent().getAttribute("login").toString());
+//               ObjectMapper mapper = new ObjectMapper();
+//               try {
+//                   String op = mapper.writeValueAsString(accountServiceOperationList);
+//                   formsDigitalBank.setAccountServiceOperation(op);
+//               } catch (JsonProcessingException e) {
+//                   e.printStackTrace();
+//               }
+//
+//               formsRestTemplateGlobal.create(formsDigitalBank);
+//               UIUtils.dialog("Formulario registrado","success").open();
+//               close();
+//           }
         });
     }
 
@@ -258,8 +260,30 @@ public class DialogDigitalBanking extends Dialog {
                         accountServiceOperation.setCreateDate(Util.formatDate(currentDate, "dd/MM/yyyy"));
                         accountServiceOperationList.add(accountServiceOperation);
                         dialogServiceOperationDigitalBank.close();
+                        accountServiceOperationList.sort(Comparator.comparing(AccountServiceOperation::getCreateDate).reversed());
                         grid.setItems(accountServiceOperationList);
-                        UIUtils.dialog("Cuentas agregadas", "success").open();
+
+
+                        if(binderForms.writeBeanIfValid(formsDigitalBank)){
+                            formsDigitalBank.setCategoryTypeForm("VARIOS");
+                            formsDigitalBank.setNameTypeForm("BANCA DIGITAL");
+                            formsDigitalBank.setIdClient(dataFormDtoGlobal.get(0).getCodeClient());
+                            formsDigitalBank.setIdUser(VaadinSession.getCurrent().getAttribute("login").toString());
+                            ObjectMapper mapper = new ObjectMapper();
+                            try {
+                                String op = mapper.writeValueAsString(accountServiceOperationList);
+                                formsDigitalBank.setAccountServiceOperation(op);
+                            } catch (JsonProcessingException e) {
+                                e.printStackTrace();
+                            }
+                            UIUtils.dialog("Cuentas agregadas", "success").open();
+
+                            formsRestTemplateGlobal.create(formsDigitalBank);
+                            UIUtils.dialog("Formulario registrado","success").open();
+
+                        }
+
+
                     } catch (Exception e) {
                         UIUtils.dialog("Existe un error, revise los datos", "error").open();
                     }
@@ -291,6 +315,7 @@ public class DialogDigitalBanking extends Dialog {
 
         grid = new Grid<>();
         grid.setSizeFull();
+        accountServiceOperationList.sort(Comparator.comparing(AccountServiceOperation::getCreateDate).reversed());
         grid.setItems(accountServiceOperationList);
         grid.addColumn(AccountServiceOperation::getAccount)
                 .setHeader("Cuentas")
@@ -320,7 +345,6 @@ public class DialogDigitalBanking extends Dialog {
                 s.setCategory(parameter.getCategory());
                 servicesList.add(s);
             }
-
         }
     }
 
@@ -373,8 +397,21 @@ public class DialogDigitalBanking extends Dialog {
 
                     accountServiceOperationList.add(accountServiceOperation);
                     dialogServiceOperationDigitalBank.close();
+                    accountServiceOperationList.sort(Comparator.comparing(AccountServiceOperation::getCreateDate).reversed());
                     grid.setItems(accountServiceOperationList);
+
+                    ObjectMapper mapper = new ObjectMapper();
+                    try {
+                        String op = mapper.writeValueAsString(accountServiceOperationList);
+                        formsDigitalBank.setAccountServiceOperation(op);
+                        formsRestTemplateGlobal.create(formsDigitalBank);
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
+
                     UIUtils.dialog("Cuenta actualizada", "success").open();
+
+
                 }catch(Exception e){
                     UIUtils.dialog("Existe un error, revise los datos", "alert").open();
                 }

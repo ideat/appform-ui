@@ -66,7 +66,7 @@ public class LoginView extends VerticalLayout {
 
                 if(users.getState().equals("ACTIVO")) {
                     if(adusrOfi==null){
-                        UIUtils.dialog("La cuenta de usuario no existe en el core finenciero","alert").open();
+                        UIUtils.dialog("La cuenta de usuario no existe en el core financiero","alert").open();
                         return;
                     }
                     if(isCurrentPassword(users, gbpmt.getGbpmtfdia())==true){

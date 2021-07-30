@@ -2,6 +2,7 @@ package com.mindware.ui.views.users;
 
 import com.mindware.backend.entity.Users;
 import com.mindware.backend.rest.email.MailRestTemplate;
+import com.mindware.backend.rest.netbank.AdusrOfiRestTemplate;
 import com.mindware.backend.rest.user.UserRestTemplate;
 import com.mindware.backend.util.PrepareMail;
 import com.mindware.ui.MainLayout;
@@ -48,6 +49,9 @@ public class UserView extends ViewFrame implements RouterLayout {
     @Autowired
     private PrepareMail prepareMail;
 
+    @Autowired
+    private AdusrOfiRestTemplate adusrOfiRestTemplate;
+
     private UserDataProvider dataProvider;
     private List<Users> usersList;
     private TextField filterText;
@@ -90,7 +94,7 @@ public class UserView extends ViewFrame implements RouterLayout {
 //        btnNew.setEnabled(GrantOptions.grantedOption("Usuarios"));
         btnNew.addClickShortcut(Key.KEY_N, KeyModifier.ALT);
         btnNew.addClickListener(e ->{
-            DialogUserCreate dialogUserCreate = new DialogUserCreate(restTemplate,new Users(), prepareMail);
+            DialogUserCreate dialogUserCreate = new DialogUserCreate(restTemplate,new Users(), prepareMail, adusrOfiRestTemplate);
             Button btnSave = new Button("Guardar");
             btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_SMALL);
             btnSave.addClickListener(click -> {
@@ -158,7 +162,7 @@ public class UserView extends ViewFrame implements RouterLayout {
         Button btnEdit = new Button("Editar");
         btnEdit.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_SUCCESS,ButtonVariant.LUMO_SMALL);
         btnEdit.addClickListener(event ->{
-            DialogUserCreate dialogUserCreate = new DialogUserCreate(restTemplate, user, prepareMail);
+            DialogUserCreate dialogUserCreate = new DialogUserCreate(restTemplate, user, prepareMail,adusrOfiRestTemplate);
             Button btnSave = new Button("Actualizar");
             dialogUserCreate.login.setReadOnly(true);
             btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_SMALL);

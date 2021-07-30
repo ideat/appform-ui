@@ -127,6 +127,7 @@ public class UsersRegister extends SplitViewFrame implements HasUrlParameter<Str
         login.setRequired(true);
         login.setRequiredIndicatorVisible(true);
 
+
         TextField names = new TextField();
         names.setWidth("100%");
         names.setRequired(true);

@@ -12,4 +12,6 @@ public class Parameter {
     private String category;
 
     private String value;
+
+    private String state;
 }

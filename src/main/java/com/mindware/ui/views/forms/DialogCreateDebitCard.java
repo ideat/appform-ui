@@ -125,16 +125,22 @@ public class DialogCreateDebitCard extends Dialog {
 
     public String getServices(){
         List<Service> serviceState = new ArrayList<>();
+        List<Service> auxService = new ArrayList<>();
+
+        for(Service s: serviceListGlobal){
+            s.setChecked("NO");
+            auxService.add(s);
+        }
 
         for(String s:servicesSelected){
-            Service service = serviceListGlobal.stream()
+            Service service = auxService.stream()
                     .filter(f -> f.getName().equals(s))
                     .collect(Collectors.toList()).get(0);
             service.setChecked("SI");
-            serviceListGlobal.removeIf(d -> d.getName().equals(s));
-            serviceListGlobal.add(service);
+            auxService.removeIf(d -> d.getName().equals(s));
+            auxService.add(service);
         }
-
+        serviceListGlobal = auxService;
         serviceState.addAll(serviceListGlobal);
 
         ObjectMapper mapper = new ObjectMapper();

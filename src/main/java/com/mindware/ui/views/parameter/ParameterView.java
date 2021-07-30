@@ -142,6 +142,9 @@ public class ParameterView extends SplitViewFrame implements RouterLayout {
         grid.addColumn(Parameter::getValue).setFlexGrow(1).setKey("value")
                 .setHeader("Valor").setSortable(true).setFrozen(false).setResizable(true)
                 .setAutoWidth(true).setTextAlign(ColumnTextAlign.START);
+        grid.addColumn(Parameter::getState).setFlexGrow(1).setKey("value")
+                .setHeader("Estado").setSortable(true).setFrozen(false).setResizable(true)
+                .setAutoWidth(true).setTextAlign(ColumnTextAlign.START);
 
         HeaderRow hr = grid.appendHeaderRow();
 
@@ -232,11 +235,16 @@ public class ParameterView extends SplitViewFrame implements RouterLayout {
         txtValue.setRequired(true);
         txtValue.setWidth("100%");
 
+        ComboBox<String> state = new ComboBox<>();
+        state.setItems("ACTIVO","BAJA");
+        state.setWidthFull();
+        state.setRequired(true);
+
         binder = new BeanValidationBinder<>(Parameter.class);
         binder.forField(cmbCategory).asRequired("Categoria es requerida").bind(Parameter::getCategory,Parameter::setCategory);
         binder.forField(txtValue).asRequired("Valor es requerido").bind(Parameter::getValue,Parameter::setValue);
         binder.forField(txtName).asRequired("Descripcion es requerida").bind(Parameter::getName,Parameter::setName);
-
+        binder.forField(state).asRequired("Estado es requerido").bind(Parameter::getState, Parameter::setState);
         binder.addStatusChangeListener(event ->{
             boolean isValid = !event.hasValidationErrors();
             boolean hasChanges = binder.hasChanges();

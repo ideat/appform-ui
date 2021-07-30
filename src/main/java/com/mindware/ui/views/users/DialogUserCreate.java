@@ -1,7 +1,9 @@
 package com.mindware.ui.views.users;
 
 import com.mindware.backend.entity.Users;
+import com.mindware.backend.entity.netbank.dto.AdusrOfi;
 import com.mindware.backend.rest.email.MailRestTemplate;
+import com.mindware.backend.rest.netbank.AdusrOfiRestTemplate;
 import com.mindware.backend.rest.user.UserRestTemplate;
 import com.mindware.backend.util.GrantOptions;
 import com.mindware.backend.util.PrepareMail;
@@ -52,8 +54,13 @@ public class DialogUserCreate extends Dialog {
     private Users userGlobal;
     private PrepareMail prepareMailGlobal;
     public TextField login;
+    private TextField names;
+    private TextField lastNames;
+    private TextField email;
 
-    public DialogUserCreate(UserRestTemplate restTemplate, Users user, PrepareMail prepareMail){
+    private AdusrOfiRestTemplate adusrOfiRestTemplateGlobal;
+
+    public DialogUserCreate(UserRestTemplate restTemplate, Users user, PrepareMail prepareMail, AdusrOfiRestTemplate adusrOfiRestTemplate){
 
         setDraggable(true);
         setModal(false);
@@ -61,7 +68,7 @@ public class DialogUserCreate extends Dialog {
         userRestTemplate = restTemplate;
         userGlobal = user;
         prepareMailGlobal = prepareMail;
-
+        adusrOfiRestTemplateGlobal = adusrOfiRestTemplate;
         // Dialog theming
         getElement().getThemeList().add("my-dialog");
         setWidth("800px");
@@ -138,14 +145,20 @@ public class DialogUserCreate extends Dialog {
         login = new TextField();
         login.setWidth("100%");
         login.setRequired(true);
+        login.setAutoselect(true);
+        login.setAutofocus(true);
         login.setRequiredIndicatorVisible(true);
+        login.getElement().addEventListener("keyup", e->{
+            findUserCore();
+        }).addEventData("element.value").setFilter("event.keyCode == 13 || event.keyCode == 9");
 
-        TextField names = new TextField();
+
+        names = new TextField();
         names.setWidth("100%");
         names.setRequired(true);
         names.setRequiredIndicatorVisible(true);
 
-        TextField lastNames = new TextField();
+        lastNames = new TextField();
         lastNames.setWidth("100%");
         lastNames.setRequired(true);
         lastNames.setRequiredIndicatorVisible(true);
@@ -155,7 +168,7 @@ public class DialogUserCreate extends Dialog {
         state.setValue(Optional.ofNullable(userGlobal.getState()).orElse("").equals("ACTIVO") ? "ACTIVO":"BAJA");
 
         ComboBox<String> rols = new ComboBox<>();
-        rols.setItems("ADMINISTRADOR","USUARIO");
+        rols.setItems("ADMINISTRADOR","OPERACIONES","USUARIO");
         rols.setRequired(true);
         rols.setRequiredIndicatorVisible(true);
 
@@ -163,7 +176,7 @@ public class DialogUserCreate extends Dialog {
         numDaysValidity.setWidth("100%");
         numDaysValidity.setRequiredIndicatorVisible(true);
 
-        TextField email = new TextField();
+        email = new TextField();
         email.setWidth("100%");
         email.setRequired(true);
         email.setRequiredIndicatorVisible(true);
@@ -219,6 +232,19 @@ public class DialogUserCreate extends Dialog {
         binder.readBean(userGlobal);
 
         return formLayout;
+    }
+
+    private void findUserCore(){
+        AdusrOfi adusrOfi = adusrOfiRestTemplateGlobal.findByLogin(login.getValue());
+        if(adusrOfi!=null) {
+            names.setValue(adusrOfi.getAdusrnomb().trim());
+            email.setValue(adusrOfi.getGbdacmail()!=null?adusrOfi.getGbdacmail().trim():"");
+        }else{
+            UIUtils.dialog("Login de usuario no existe en el Core Financiero","alert");
+            login.focus();
+
+        }
+
     }
 
     private void minimise() {

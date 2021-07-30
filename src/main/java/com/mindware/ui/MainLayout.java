@@ -141,6 +141,11 @@ public class MainLayout extends FlexBoxLayout
 			menu.addNaviItem(personnel, "Parametros", ParameterView.class);
 			menu.addNaviItem(personnel, "Usuarios", UserView.class);
 		}
+		if(VaadinSession.getCurrent().getAttribute("rol").toString().equals("OPERACIONES")) {
+			NaviItem personnel = menu.addNaviItem(VaadinIcon.STOP_COG, "Configuracion",
+					null);
+			menu.addNaviItem(personnel, "Parametros", ParameterView.class);
+		}
 
 	}
 
