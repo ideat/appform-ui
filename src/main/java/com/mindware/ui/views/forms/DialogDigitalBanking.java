@@ -73,6 +73,8 @@ public class DialogDigitalBanking extends Dialog {
     private FormsRestTemplate formsRestTemplateGlobal;
     private DataFormDto dataFormDto;
 
+    private TextField user;
+
     public DialogDigitalBanking(List<DataFormDto> dataFormDto, List<Parameter> parameterList, FormsRestTemplate formsRestTemplate)  {
 
         setDraggable(true);
@@ -186,7 +188,7 @@ public class DialogDigitalBanking extends Dialog {
         TextField email = new TextField();
         email.setWidthFull();
 
-        TextField user = new TextField();
+        user = new TextField();
         user.setWidthFull();
 
         formLayout.addFormItem(name,"Nombre cliente");
@@ -239,6 +241,11 @@ public class DialogDigitalBanking extends Dialog {
         });
 
         btnCreate.addClickListener(event -> {
+            if(user.getValue()==null || user.getValue().isEmpty()){
+                UIUtils.dialog("Primero ingrese el usuario del cliente para Banca Digital", "alert").open();
+                user.focus();
+                return;
+            }
             if(!accountsSelected.isEmpty()) {
                 fillNewServicesAndOperations();
                 Button btnSave = new Button("Agregar");
@@ -258,6 +265,7 @@ public class DialogDigitalBanking extends Dialog {
                         accountServiceOperation.setReasonOpening(dialogServiceOperationDigitalBank.textArea.getValue());
                         Date currentDate = (Date) VaadinSession.getCurrent().getAttribute("current-date");
                         accountServiceOperation.setCreateDate(Util.formatDate(currentDate, "dd/MM/yyyy"));
+                        accountServiceOperation.setOriginModule("AUTOFORM");
                         accountServiceOperationList.add(accountServiceOperation);
                         dialogServiceOperationDigitalBank.close();
                         accountServiceOperationList.sort(Comparator.comparing(AccountServiceOperation::getCreateDate).reversed());
@@ -278,7 +286,8 @@ public class DialogDigitalBanking extends Dialog {
                             }
                             UIUtils.dialog("Cuentas agregadas", "success").open();
 
-                            formsRestTemplateGlobal.create(formsDigitalBank);
+                            Forms savedForm = formsRestTemplateGlobal.create(formsDigitalBank);
+                            formsDigitalBank = savedForm;
                             UIUtils.dialog("Formulario registrado","success").open();
 
                         }
@@ -327,6 +336,7 @@ public class DialogDigitalBanking extends Dialog {
                 .setFlexGrow(0)
                 .setResizable(true)
                 .setAutoWidth(true);
+
         grid.addColumn(new ComponentRenderer<>(this::createTaskGrid))
                 .setFlexGrow(0).setAutoWidth(true);
 
@@ -372,21 +382,39 @@ public class DialogDigitalBanking extends Dialog {
         layout.add(btnEdit,btnPrint);
 
         btnEdit.addClickListener(click -> {
+            if(user.isEmpty()){
+                UIUtils.dialog("Ingrese el usuario de banca digitla", "alert").open();
+                user.focus();
+                user.setInvalid(true);
+                return;
+            }
+            if(accountServiceOperation.getAccount()==null || accountServiceOperation.getAccount().equals("")){
+                if(accountsSelected.isEmpty()) {
+                    UIUtils.dialog("Seleccione una cuenta antes de editar", "info").open();
+                    return;
+                }
+                accountServiceOperation.setAccount(String.join(" - ",accountsSelected));
+            }
+
             fillRegisteredServicesAndOperations(accountServiceOperation.getServices());
             Button btnSave = new Button("Modificar");
             btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
             dialogServiceOperationDigitalBank = new DialogServiceOperationDigitalBank(servicesList);
             dialogServiceOperationDigitalBank.footer.add(btnSave);
-            dialogServiceOperationDigitalBank.extensionAmount.setValue(accountServiceOperation.getExtensionAmount()!=null?accountServiceOperation.getExtensionAmount():0.0);
-            dialogServiceOperationDigitalBank.decreaseAmount.setValue(accountServiceOperation.getDecreaseAmount()!=null?accountServiceOperation.getDecreaseAmount():0.0);
-            if(accountServiceOperation.getExtensionAmount()!=null && accountServiceOperation.getExtensionAmount()>0) dialogServiceOperationDigitalBank.extensionAmount.setVisible(true);
-            if(accountServiceOperation.getDecreaseAmount()!=null && accountServiceOperation.getDecreaseAmount()>0) dialogServiceOperationDigitalBank.decreaseAmount.setVisible(true);
+            dialogServiceOperationDigitalBank.extensionAmount.setValue(accountServiceOperation.getExtensionAmount()!=null?
+                    accountServiceOperation.getExtensionAmount():0.0);
+            dialogServiceOperationDigitalBank.decreaseAmount.setValue(accountServiceOperation.getDecreaseAmount()!=null?
+                    accountServiceOperation.getDecreaseAmount():0.0);
+            if(accountServiceOperation.getExtensionAmount()!=null && accountServiceOperation.getExtensionAmount()>0)
+                dialogServiceOperationDigitalBank.extensionAmount.setVisible(true);
+            if(accountServiceOperation.getDecreaseAmount()!=null && accountServiceOperation.getDecreaseAmount()>0)
+                dialogServiceOperationDigitalBank.decreaseAmount.setVisible(true);
 
             dialogServiceOperationDigitalBank.textArea.setValue(accountServiceOperation.getReasonOpening());
             dialogServiceOperationDigitalBank.open();
             btnSave.addClickListener(event -> {
                 try {
-//                    accountServiceOperation.setAccount(String.join(" - ",accountsSelected));
+
                     accountServiceOperation.setServices(dialogServiceOperationDigitalBank.getServices());
                     accountServiceOperation.setExtensionAmount(dialogServiceOperationDigitalBank.extensionAmount.getValue());
                     accountServiceOperation.setDecreaseAmount(dialogServiceOperationDigitalBank.decreaseAmount.getValue());
@@ -396,20 +424,30 @@ public class DialogDigitalBanking extends Dialog {
                     accountServiceOperationList.removeIf(f -> f.getId().equals(accountServiceOperation.getId()));
 
                     accountServiceOperationList.add(accountServiceOperation);
-                    dialogServiceOperationDigitalBank.close();
+
                     accountServiceOperationList.sort(Comparator.comparing(AccountServiceOperation::getCreateDate).reversed());
                     grid.setItems(accountServiceOperationList);
 
                     ObjectMapper mapper = new ObjectMapper();
                     try {
                         String op = mapper.writeValueAsString(accountServiceOperationList);
-                        formsDigitalBank.setAccountServiceOperation(op);
-                        formsRestTemplateGlobal.create(formsDigitalBank);
+                        if(binderForms.writeBeanIfValid(formsDigitalBank)){
+                            formsDigitalBank.setAccountServiceOperation(op);
+                            if(formsDigitalBank.getIdUser()==null || formsDigitalBank.getIdUser().equals("")){
+                                formsDigitalBank.setIdUser(VaadinSession.getCurrent().getAttribute("login").toString());
+                            }
+                            formsRestTemplateGlobal.create(formsDigitalBank);
+                            dialogServiceOperationDigitalBank.close();
+                            UIUtils.dialog("Cuenta actualizada", "success").open();
+                        }else{
+                            UIUtils.dialog("Revise datos","alert").open();
+                        }
+
                     } catch (JsonProcessingException e) {
                         e.printStackTrace();
                     }
 
-                    UIUtils.dialog("Cuenta actualizada", "success").open();
+
 
 
                 }catch(Exception e){
@@ -420,7 +458,7 @@ public class DialogDigitalBanking extends Dialog {
 
         btnPrint.addClickListener(click -> {
             FormReportView report = new FormReportView(formsDigitalBank.getIdClient(),accountServiceOperation.getId(),
-                    formsDigitalBank.getNameTypeForm(),formsDigitalBank.getCategoryTypeForm(),formsRestTemplateGlobal,"","");
+                    formsDigitalBank.getNameTypeForm(),formsDigitalBank.getCategoryTypeForm(),formsRestTemplateGlobal,"","",null);
             report.open();
         });
 

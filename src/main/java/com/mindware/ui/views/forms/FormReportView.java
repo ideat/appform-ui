@@ -1,11 +1,13 @@
 package com.mindware.ui.views.forms;
 
+import com.mindware.backend.rest.contract.ContractRestTemplate;
 import com.mindware.backend.rest.forms.FormsRestTemplate;
 import com.mindware.ui.components.FlexBoxLayout;
 import com.mindware.ui.components.detailsdrawer.DetailsDrawer;
 import com.mindware.ui.layout.size.Horizontal;
 import com.mindware.ui.layout.size.Top;
 import com.mindware.ui.util.EmbeddedPdfDocument;
+import com.mindware.ui.util.UIUtils;
 import com.mindware.ui.util.css.BoxSizing;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
@@ -40,7 +42,8 @@ public class FormReportView extends Dialog  {
 
 
     public FormReportView(Integer codeClient, String idAccount, String typeForm,
-                          String categoryTypeForm, FormsRestTemplate restTemplate, String others, String login){
+                          String categoryTypeForm, FormsRestTemplate restTemplate,
+                          String others, String login, ContractRestTemplate contractRestTemplate){
         setDraggable(true);
         setModal(false);
         setResizable(true);
@@ -72,7 +75,21 @@ public class FormReportView extends Dialog  {
 
 
         if(categoryTypeForm.equals("CAJA-AHORRO") || categoryTypeForm.equals("DPF")){
-            file = restTemplate.report(codeClient,idAccount,typeForm,categoryTypeForm);
+            if(typeForm.equals("FORMULARIO APERTURA")) {
+                try {
+                    file = restTemplate.report(codeClient, idAccount, typeForm, categoryTypeForm);
+                } catch (Exception e) {
+                    UIUtils.dialog("Error:" + e.getMessage(), "alert").open();
+
+                }
+            }else{
+                try {
+                    file = contractRestTemplate.contract(codeClient, idAccount, typeForm, categoryTypeForm);
+                }catch (Exception e){
+                    UIUtils.dialog("Error:" + e.getMessage(), "alert").open();
+
+                }
+            }
         }else if(categoryTypeForm.equals("VARIOS") && typeForm.equals("BANCA DIGITAL")){
             file = restTemplate.reportDigitalBank(codeClient,idAccount,typeForm,categoryTypeForm);
         }else if(categoryTypeForm.equals("VARIOS") && typeForm.equals("SERVICIOS TD")){

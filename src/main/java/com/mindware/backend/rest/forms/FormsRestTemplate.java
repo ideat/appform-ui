@@ -24,6 +24,7 @@ public class FormsRestTemplate {
 
     public Forms create(Forms forms){
         final String uri = url + "/form/create";
+        forms.setOriginModule("AUTO-FORM");
         HttpEntity<Forms> entity = new HttpEntity<>(forms,HeaderJwt.getHeader());
         ResponseEntity<Forms> response = restTemplate.postForEntity(uri,entity,Forms.class);
         return response.getBody();

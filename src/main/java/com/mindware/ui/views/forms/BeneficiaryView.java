@@ -3,6 +3,7 @@ package com.mindware.ui.views.forms;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mindware.backend.entity.Beneficiary;
+import com.mindware.backend.entity.netbank.Gbcon;
 import com.mindware.backend.entity.netbank.dto.GbageLabDto;
 import com.mindware.backend.rest.netbank.GbageLabDtoRestTemplate;
 import com.vaadin.flow.component.Component;
@@ -55,14 +56,15 @@ public class BeneficiaryView extends Dialog {
     private BeneficiarySearch beneficiarySearch;
 
     private RadioButtonGroup<String> radioSearch = new RadioButtonGroup<>();
+    private List<Gbcon> gbconListGlobal;
 
-    public BeneficiaryView(String beneficiary, GbageLabDtoRestTemplate gbageLabDtoRestTemplate){
+    public BeneficiaryView(String beneficiary, GbageLabDtoRestTemplate gbageLabDtoRestTemplate, List<Gbcon> gbconList){
         setDraggable(true);
         setModal(false);
         setResizable(true);
 
         gbageLabDtoRestTemplateGlobal = gbageLabDtoRestTemplate;
-
+        gbconListGlobal = gbconList;
         // Dialog theming
         getElement().getThemeList().add("my-dialog");
         setWidth("800px");
@@ -117,7 +119,7 @@ public class BeneficiaryView extends Dialog {
             Button save = new Button("Guardar");
 
             if(gbageLabDtoList.size()==0){
-                beneficiaryRegisterView = new BeneficiaryRegisterView(newItem);
+                beneficiaryRegisterView = new BeneficiaryRegisterView(newItem, gbconListGlobal);
 
                 save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
                 footer.add(save);
@@ -135,13 +137,13 @@ public class BeneficiaryView extends Dialog {
                 newItem.setFullName(gbageLabDtoList.get(0).getGbagenomb());
                 newItem.setIdCard(gbageLabDtoList.get(0).getGbagendid());
                 newItem.setTelephone(gbageLabDtoList.get(0).getGbagetlfd());
-                newItem.setEconomicActivity(gbageLabDtoList.get(0).getGblabdact());
+                newItem.setEconomicActivity(gbageLabDtoList.get(0).getGbcaedesc());
                 newItem.setNationality(gbageLabDtoList.get(0).getGbagenaci());
                 newItem.setAddress(gbageLabDtoList.get(0).getGbagedir1());
 
                 save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
                 footer.add(save);
-                beneficiaryRegisterView = new BeneficiaryRegisterView(newItem);
+                beneficiaryRegisterView = new BeneficiaryRegisterView(newItem,gbconListGlobal);
                 beneficiaryRegisterView.add(footer);
                 beneficiaryRegisterView.open();
                 save.addClickListener(e -> {
@@ -249,7 +251,7 @@ public class BeneficiaryView extends Dialog {
             Button save = new Button("Guardar");
             save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
             footer.add(save);
-            beneficiaryRegisterView = new BeneficiaryRegisterView(beneficiary);
+            beneficiaryRegisterView = new BeneficiaryRegisterView(beneficiary,gbconListGlobal);
 
             beneficiaryRegisterView.add(footer);
             beneficiaryRegisterView.open();
@@ -309,7 +311,7 @@ public class BeneficiaryView extends Dialog {
             newItem.setEconomicActivity(gbageLabDtoList.get(0).getGblabdact());
             newItem.setNationality(gbageLabDtoList.get(0).getGbagenaci());
             newItem.setAddress(gbageLabDtoList.get(0).getGbagedir1());
-            beneficiaryRegisterView = new BeneficiaryRegisterView(newItem);
+            beneficiaryRegisterView = new BeneficiaryRegisterView(newItem,gbconListGlobal);
             Footer footer = new Footer();
             Button save = new Button("Guardar");
             footer.add(save);

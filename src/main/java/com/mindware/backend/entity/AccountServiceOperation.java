@@ -25,4 +25,6 @@ public class AccountServiceOperation {
 
     private String accountSavingBank;
 
+    private String originModule;
+
 }

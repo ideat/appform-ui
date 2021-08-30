@@ -1,9 +1,11 @@
 package com.mindware.ui.views.forms;
 
 import com.mindware.backend.entity.Forms;
+import com.mindware.backend.entity.netbank.Gbcon;
 import com.mindware.backend.entity.netbank.dto.DataFormDto;
 import com.mindware.backend.rest.forms.FormsRestTemplate;
 import com.mindware.backend.rest.netbank.GbageLabDtoRestTemplate;
+import com.mindware.backend.rest.netbank.GbconRestTemplate;
 import com.mindware.ui.util.UIUtils;
 import com.mindware.ui.util.Util;
 import com.vaadin.flow.component.button.Button;
@@ -25,6 +27,10 @@ import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.theme.lumo.Lumo;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @CssImport("./styles/my-dialog.css")
 public class DialogFormSavingBank extends Dialog {
@@ -50,11 +56,11 @@ public class DialogFormSavingBank extends Dialog {
     private Forms forms;
     private FormsRestTemplate formsRestTemplateGlobal;
     private GbageLabDtoRestTemplate gbageLabDtoRestTemplateGlobal;
-
+    private List<Gbcon> gbconList = new ArrayList<>();
 
     public DialogFormSavingBank(String accountCode, String categoryTypeForm, String nameTypeForm,
                                 DataFormDto dataFormDto, FormsRestTemplate formsRestTemplate,
-                                GbageLabDtoRestTemplate gbageLabDtoRestTemplate ){
+                                GbageLabDtoRestTemplate gbageLabDtoRestTemplate, GbconRestTemplate gbconRestTemplate){
         setDraggable(true);
         setModal(false);
         setResizable(true);
@@ -86,6 +92,12 @@ public class DialogFormSavingBank extends Dialog {
         header = new Header(title, min, max, close);
         header.getElement().getThemeList().add(Lumo.DARK);
         add(header);
+
+        gbconList = gbconRestTemplate.findAll();
+        gbconList = gbconList.stream()
+                .filter(l -> l.getGbconpfij()==95 && l.getGbconcorr()>0)
+                .collect(Collectors.toList());
+
 
         btnSave = new Button("Guardar");
         discardDraft = new Button(VaadinIcon.TRASH.create());
@@ -346,7 +358,7 @@ public class DialogFormSavingBank extends Dialog {
         btnBeneficiary.addClickListener(click -> {
             String be = forms.getBeneficiary()==null || forms.getBeneficiary().isEmpty()?"[]":forms.getBeneficiary();
 
-            BeneficiaryView beneficiaryView = new BeneficiaryView(be, gbageLabDtoRestTemplateGlobal);
+            BeneficiaryView beneficiaryView = new BeneficiaryView(be, gbageLabDtoRestTemplateGlobal, gbconList);
             Footer footer = new Footer();
             Button save = new Button("Añadir al formulario");
             save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);

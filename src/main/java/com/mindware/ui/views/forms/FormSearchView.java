@@ -3,9 +3,11 @@ package com.mindware.ui.views.forms;
 import com.mindware.backend.entity.Parameter;
 import com.mindware.backend.entity.netbank.dto.DataFormDto;
 import com.mindware.backend.entity.netbank.dto.GbageDto;
+import com.mindware.backend.rest.contract.ContractRestTemplate;
 import com.mindware.backend.rest.forms.FormsRestTemplate;
 import com.mindware.backend.rest.netbank.GbageDtoRestTemplate;
 import com.mindware.backend.rest.netbank.GbageLabDtoRestTemplate;
+import com.mindware.backend.rest.netbank.GbconRestTemplate;
 import com.mindware.backend.rest.parameter.ParameterRestTemplate;
 import com.mindware.ui.MainLayout;
 import com.mindware.ui.components.FlexBoxLayout;
@@ -55,6 +57,12 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
 
     @Autowired
     private ParameterRestTemplate parameterRestTemplate;
+
+    @Autowired
+    private GbconRestTemplate gbconRestTemplate;
+
+    @Autowired
+    private ContractRestTemplate contractRestTemplate;
 
     private List<GbageDto> gbageDtoList = new ArrayList<>();
 
@@ -227,7 +235,11 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
                 } else {
 
                     if (gbageDto.getAccountName().equals("CAJA-AHORRO") || gbageDto.getAccountName().equals("DPF")) {
-                        openDialog(gbageDto.getGbagecage(), gbageDto.getAccountCode(), gbageDto.getAccountName(), taskSelect.getValue());
+                        if(taskSelect.getValue().equals("CONTRATO")){
+
+                        }else {
+                            openDialog(gbageDto.getGbagecage(), gbageDto.getAccountCode(), gbageDto.getAccountName(), taskSelect.getValue());
+                        }
                     }
                 }
             }else{
@@ -237,11 +249,27 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
 
         btnPrint.addClickListener(click ->{
            if( taskSelect.getValue()!=null && !taskSelect.getValue().isEmpty()) {
-               FormReportView report = new FormReportView(gbageDto.getGbagecage(), gbageDto.getAccountCode(),
-                       taskSelect.getValue(), gbageDto.getAccountName(), formsRestTemplate,"","");
-               report.open();
+               if(taskSelect.getValue().equals("FORMULARIO APERTURA")) {
+                   try {
+                       FormReportView report = new FormReportView(gbageDto.getGbagecage(), gbageDto.getAccountCode(),
+                               taskSelect.getValue(), gbageDto.getAccountName(), formsRestTemplate, "", "",contractRestTemplate);
+                       report.open();
+                   } catch (Exception e) {
+
+                   }
+               }else if(taskSelect.getValue().equals("CONTRATO")){
+                   try {
+                       FormReportView report = new FormReportView(gbageDto.getGbagecage(), gbageDto.getAccountCode(),
+                               taskSelect.getValue(), gbageDto.getAccountName(), formsRestTemplate, "", "", contractRestTemplate);
+                       report.open();
+                   }catch (Exception e){
+
+                   }
+               }
+
            }else{
                UIUtils.dialog("Seleccione una tarea","info").open();
+               return;
            }
         });
 
@@ -259,7 +287,7 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
         if(categoryTypeForm.equals("CAJA-AHORRO") || categoryTypeForm.equals("DPF")) {
             DataFormDto dataFormDto = formsRestTemplate.findDataFormDtoFormSavingBoxByCageAndAccount(cage, accountCode,categoryTypeForm);
             dialogFormSavingBank = new DialogFormSavingBank(accountCode, categoryTypeForm, nameTypeForm,
-                    dataFormDto, formsRestTemplate, gbageLabDtoRestTemplate);
+                    dataFormDto, formsRestTemplate, gbageLabDtoRestTemplate, gbconRestTemplate);
             dialogFormSavingBank.open();
         }else if(categoryTypeForm.equals("VARIOS") && nameTypeForm.equals("BANCA DIGITAL")){
             try {

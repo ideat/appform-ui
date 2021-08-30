@@ -103,7 +103,7 @@ public class FormVerifyIdCard extends SplitViewFrame implements RouterLayout {
             btnSave.addClickListener(event ->{
                 forms.setNameTypeForm("VERIF. SEGIP");
                 forms.setCategoryTypeForm("VARIOS");
-
+                forms.setOriginModule("AUTOFORM");
                 forms.setIdCardForVerification(dialogVerificationIdCard.getDataIdCardListString());
                 forms.setIdUser(VaadinSession.getCurrent().getAttribute("login").toString());
                 if(forms.getCreationDate()==null){
@@ -193,6 +193,9 @@ public class FormVerifyIdCard extends SplitViewFrame implements RouterLayout {
             dialogVerificationIdCard.footer.add(btnSave, btnClose);
             btnSave.addClickListener(event ->{
                forms.setIdCardForVerification(dialogVerificationIdCard.getDataIdCardListString());
+               if(forms.getIdUser()==null || forms.getIdUser().equals("")){
+                   forms.setIdUser(VaadinSession.getCurrent().getAttribute("login").toString());
+               }
                formsRestTemplate.create(forms);
                dialogVerificationIdCard.close();
                formsVerificationIdCardList.removeIf(f -> f.getId().equals(forms.getId()));
@@ -204,9 +207,13 @@ public class FormVerifyIdCard extends SplitViewFrame implements RouterLayout {
         });
 
         btnPrint.addClickListener(click -> {
-            FormReportView report = new FormReportView(0, "",
-                   "VERIF. SEGIP","VARIOS", formsRestTemplate,forms.getId(),forms.getIdUser());
-            report.open();
+            if(forms.getIdUser()!=null) {
+                FormReportView report = new FormReportView(0, "",
+                        "VERIF. SEGIP", "VARIOS", formsRestTemplate, forms.getId(), forms.getIdUser(), null);
+                report.open();
+            }else{
+                UIUtils.dialog("Edite el formulario y guarde para que se asigne el formulario a su usuario","alert").open();
+            }
         });
 
         return layout;

@@ -1,6 +1,7 @@
 package com.mindware.ui.views.forms;
 
 import com.mindware.backend.entity.Beneficiary;
+import com.mindware.backend.entity.netbank.Gbcon;
 import com.mindware.ui.components.FlexBoxLayout;
 import com.mindware.ui.layout.size.Right;
 import com.mindware.ui.util.UIUtils;
@@ -21,7 +22,9 @@ import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.theme.lumo.Lumo;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @CssImport("./styles/my-dialog.css")
 public class BeneficiaryRegisterView extends Dialog {
@@ -40,11 +43,15 @@ public class BeneficiaryRegisterView extends Dialog {
 //    private Footer footer;
 //    public String valueClose = "salio";
     public Beneficiary beneficiaryGlobal;
-    public BeneficiaryRegisterView(Beneficiary beneficiary){
+    private List<String> gbconListGlobal;
+    public BeneficiaryRegisterView(Beneficiary beneficiary, List<Gbcon> gbconList){
         beneficiaryGlobal = beneficiary;
         setDraggable(true);
         setModal(false);
         setResizable(true);
+        gbconListGlobal = gbconList.stream()
+                .map(Gbcon::getGbcondesc)
+                .collect(Collectors.toList());
 
         // Dialog theming
         getElement().getThemeList().add("my-dialog");
@@ -118,7 +125,7 @@ public class BeneficiaryRegisterView extends Dialog {
         economicActivity.setWidthFull();
 
         ComboBox<String> nationality = new ComboBox();
-        nationality.setItems("BOLIVIANA","ARGENTINA" );
+        nationality.setItems(gbconListGlobal );
         nationality.setWidthFull();
 
         TextField address = new TextField();

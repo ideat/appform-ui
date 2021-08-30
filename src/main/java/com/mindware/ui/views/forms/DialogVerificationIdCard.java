@@ -141,7 +141,7 @@ public class DialogVerificationIdCard extends Dialog {
 
         extension = new ComboBox();
         extension.setAllowCustomValue(true);
-        String[] ex = {"CB","LP","PD","OR","PO","CH","TJ","OR","LP",""};
+        String[] ex = {"CB","LP","PA","OR","PO","CH","TJ","OR","BE","SC",""};
         extension.setItems(ex);
         extension.setWidthFull();
 

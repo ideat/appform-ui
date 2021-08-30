@@ -28,4 +28,6 @@ public class GbageLabDto {
     private String gbdacmail;
 
     private String gbdaccelu;
+
+    private String gbcaedesc;
 }

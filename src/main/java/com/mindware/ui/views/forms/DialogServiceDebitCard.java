@@ -228,6 +228,7 @@ public class DialogServiceDebitCard extends Dialog {
                     Date date = new Date();
                     String hour = formatter.format(date);
                     accountServiceOperation.setHourCreate(hour);
+                    accountServiceOperation.setOriginModule("AUTOFORM");
 
                     accountServiceOperationList.add(accountServiceOperation);
                     accountServiceOperationList.sort(Comparator.comparing(AccountServiceOperation::getCreateDate).reversed());
@@ -249,7 +250,8 @@ public class DialogServiceDebitCard extends Dialog {
                             e.printStackTrace();
                         }
 
-                        formsRestTemplateGlobal.create(formsDebitCard);
+                        Forms savedForms = formsRestTemplateGlobal.create(formsDebitCard);
+                        formsDebitCard = savedForms;
                         UIUtils.dialog("Formulario registrado","success").open();
 
                     }
@@ -326,7 +328,7 @@ public class DialogServiceDebitCard extends Dialog {
             dialogCreateDebitCard.footer.add(btnSave,btnCancel);
             dialogCreateDebitCard.extensionAmount.setValue(accountServiceOperation.getExtensionAmount()!=null?accountServiceOperation.getExtensionAmount():0.0);
             dialogCreateDebitCard.decreaseAmount.setValue(accountServiceOperation.getDecreaseAmount()!=null?accountServiceOperation.getDecreaseAmount():0.0);
-            dialogCreateDebitCard.numberDebitCard.setValue(accountServiceOperation.getAccount());
+            dialogCreateDebitCard.numberDebitCard.setValue(accountServiceOperation.getAccount()!=null?accountServiceOperation.getAccount():"");
             if(accountServiceOperation.getExtensionAmount()!=null && accountServiceOperation.getExtensionAmount()>0)
                 dialogCreateDebitCard.extensionAmount.setVisible(true);
             if(accountServiceOperation.getDecreaseAmount()!=null && accountServiceOperation.getDecreaseAmount()>0)
@@ -342,6 +344,7 @@ public class DialogServiceDebitCard extends Dialog {
                     accountServiceOperation.setDecreaseAmount(dialogCreateDebitCard.decreaseAmount.getValue());
                     accountServiceOperation.setExtensionAmount(dialogCreateDebitCard.extensionAmount.getValue());
                     accountServiceOperation.setAccount(dialogCreateDebitCard.numberDebitCard.getValue());
+                    accountServiceOperation.setAccountSavingBank(dialogCreateDebitCard.cmbAccountSavingBank.getValue());
 
                     accountServiceOperationList.removeIf(f -> f.getId().equals(accountServiceOperation.getId()));
 
@@ -353,6 +356,10 @@ public class DialogServiceDebitCard extends Dialog {
                     try {
                         String op = mapper.writeValueAsString(accountServiceOperationList);
                         formsDebitCard.setAccountServiceOperation(op);
+                        if(formsDebitCard.getIdUser()==null || formsDebitCard.getIdUser().equals("")){
+                            formsDebitCard.setIdUser(VaadinSession.getCurrent().getAttribute("login").toString());
+                        }
+
                     } catch (JsonProcessingException e) {
                         e.printStackTrace();
                     }
@@ -371,7 +378,7 @@ public class DialogServiceDebitCard extends Dialog {
 
         btnPrint.addClickListener(click -> {
             FormReportView report = new FormReportView(formsDebitCard.getIdClient(),accountServiceOperation.getId(),
-                    formsDebitCard.getNameTypeForm(),formsDebitCard.getCategoryTypeForm(),formsRestTemplateGlobal,"","");
+                    formsDebitCard.getNameTypeForm(),formsDebitCard.getCategoryTypeForm(),formsRestTemplateGlobal,"","",null);
             report.open();
         });
 
@@ -400,7 +407,7 @@ public class DialogServiceDebitCard extends Dialog {
                 return;
             }
             FormReportView report = new FormReportView(formsDebitCard.getIdClient(),accountServiceOperation.getId(),
-                    formsDebitCard.getNameTypeForm(),formsDebitCard.getCategoryTypeForm(),formsRestTemplateGlobal,"DELIVER","");
+                    formsDebitCard.getNameTypeForm(),formsDebitCard.getCategoryTypeForm(),formsRestTemplateGlobal,"DELIVER","",null);
             report.open();
 
         });

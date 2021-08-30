@@ -11,6 +11,7 @@ import com.mindware.backend.rest.netbank.GbpmtRestTemplate;
 import com.mindware.backend.rest.user.UserRestTemplate;
 import com.mindware.ui.util.UIUtils;
 import com.mindware.ui.views.users.DialogUpdatePassword;
+import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.login.LoginI18n;
@@ -30,6 +31,8 @@ public class LoginView extends VerticalLayout {
     private final LoginI18n i18n = LoginI18n.createDefault();
     private boolean isHasPass;
     private String login;
+
+    @Autowired
     private LoginRestTemplate restTemplate;
 
     @Autowired
@@ -41,9 +44,18 @@ public class LoginView extends VerticalLayout {
     @Autowired
     private AdusrOfiRestTemplate adusrOfiRestTemplate;
 
+//    protected void onAttach(AttachEvent attachEvent){
+//        UI ui = getUI().get();
+//        ui.setPollInterval(30000);
+//    }
+
+
     public LoginView(){
         restTemplate = new LoginRestTemplate();
 //        userRestTemplate = new UserRestTemplate();
+        VaadinSession.getCurrent()
+                .getSession()
+                .setMaxInactiveInterval(30000);
         LoginForm component = new LoginForm();
         component.setI18n(createSpanishI18n());
         component.addLoginListener(e -> {
@@ -57,12 +69,14 @@ public class LoginView extends VerticalLayout {
             try {
                 Token token = restTemplate.getToken(jwtRequest);
                 String loginUser = e.getUsername().toUpperCase();
+//                VaadinSession.getCurrent().getSession().setMaxInactiveInterval(60000);
                 VaadinSession.getCurrent().setAttribute("jwt", token.getToken());
 
                 Users users = userRestTemplate.findByLogin(loginUser);
                 AdusrOfi adusrOfi = adusrOfiRestTemplate.findByLogin(loginUser);
                 Gbpmt gbpmt = gbpmtRestTemplate.findAll();
                 VaadinSession.getCurrent().setAttribute("jwt", null);
+
 
                 if(users.getState().equals("ACTIVO")) {
                     if(adusrOfi==null){

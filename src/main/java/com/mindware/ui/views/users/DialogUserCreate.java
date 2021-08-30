@@ -27,6 +27,7 @@ import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
+import com.vaadin.flow.data.binder.Validator;
 import com.vaadin.flow.data.validator.EmailValidator;
 import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.theme.lumo.Lumo;
@@ -66,6 +67,7 @@ public class DialogUserCreate extends Dialog {
         setModal(false);
         setResizable(true);
         userRestTemplate = restTemplate;
+        if(user.getId()==null) user.setNumDaysValidity(90);
         userGlobal = user;
         prepareMailGlobal = prepareMail;
         adusrOfiRestTemplateGlobal = adusrOfiRestTemplate;
@@ -123,7 +125,8 @@ public class DialogUserCreate extends Dialog {
                 Date createdate = (Date) VaadinSession.getCurrent().getAttribute("current-date");
                 userGlobal.setCreateDate(createdate);
                 userGlobal.setState("RESET");
-                userRestTemplate.add(userGlobal);
+                Users newUsers =  userRestTemplate.add(userGlobal);
+                userGlobal = newUsers;
                 prepareMailGlobal.sendMailCreateUser(userGlobal,userGlobal.getPassword()
                         , userGlobal.getLogin()
                         , VaadinSession.getCurrent().getAttribute("email").toString());
@@ -175,6 +178,10 @@ public class DialogUserCreate extends Dialog {
         NumberField numDaysValidity = new NumberField();
         numDaysValidity.setWidth("100%");
         numDaysValidity.setRequiredIndicatorVisible(true);
+        numDaysValidity.setHasControls(true);
+        numDaysValidity.setMin(1);
+
+
 
         email = new TextField();
         email.setWidth("100%");
@@ -204,6 +211,7 @@ public class DialogUserCreate extends Dialog {
         binder.forField(rols).asRequired("Rol es requerido").bind(Users::getRolName,Users::setRolName);
         binder.forField(numDaysValidity).asRequired("Dias de Validez es requerido")
                 .withConverter(new Util.DoubleToIntegerConverter())
+                .withValidator(value -> value.intValue()>=1,"Numero de dias no puede ser menor a 1")
                 .bind(Users::getNumDaysValidity,Users::setNumDaysValidity);
         binder.forField(email).asRequired("Email es requerido")
                 .withValidator(new EmailValidator("Correo invalido"))

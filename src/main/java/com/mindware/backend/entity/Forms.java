@@ -73,6 +73,8 @@ public class Forms {
 
     private String sourceFounds;
 
+    private String originModule;
+
     public LocalDate getCreationDateConverter(){
         if(creationDate!=null) {
             return creationDate.toInstant()

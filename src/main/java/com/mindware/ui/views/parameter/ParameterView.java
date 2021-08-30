@@ -142,9 +142,9 @@ public class ParameterView extends SplitViewFrame implements RouterLayout {
         grid.addColumn(Parameter::getValue).setFlexGrow(1).setKey("value")
                 .setHeader("Valor").setSortable(true).setFrozen(false).setResizable(true)
                 .setAutoWidth(true).setTextAlign(ColumnTextAlign.START);
-        grid.addColumn(Parameter::getState).setFlexGrow(1).setKey("value")
-                .setHeader("Estado").setSortable(true).setFrozen(false).setResizable(true)
-                .setAutoWidth(true).setTextAlign(ColumnTextAlign.START);
+//        grid.addColumn(Parameter::getState).setFlexGrow(1).setKey("state")
+//                .setHeader("Estado").setSortable(true).setFrozen(false).setResizable(true)
+//                .setAutoWidth(true).setTextAlign(ColumnTextAlign.START);
 
         HeaderRow hr = grid.appendHeaderRow();
 
@@ -192,7 +192,9 @@ public class ParameterView extends SplitViewFrame implements RouterLayout {
                     parameterList.add(result);
                     grid.getDataProvider().refreshAll();
                 }else{
-                    grid.getDataProvider().refreshItem(current);
+//                    parameterList.removeIf(p ->p.getId().equals(result.getId()));
+//                    parameterList.add(result);
+                    grid.getDataProvider().refreshItem(result);
                 }
                 detailsDrawer.hide();
             }else{
@@ -242,15 +244,15 @@ public class ParameterView extends SplitViewFrame implements RouterLayout {
 
         binder = new BeanValidationBinder<>(Parameter.class);
         binder.forField(cmbCategory).asRequired("Categoria es requerida").bind(Parameter::getCategory,Parameter::setCategory);
-        binder.forField(txtValue).asRequired("Valor es requerido").bind(Parameter::getValue,Parameter::setValue);
-        binder.forField(txtName).asRequired("Descripcion es requerida").bind(Parameter::getName,Parameter::setName);
+        binder.forField(txtValue).bind(Parameter::getValue,Parameter::setValue);
+        binder.forField(txtName).asRequired("Nombre es requerido").bind(Parameter::getName,Parameter::setName);
         binder.forField(state).asRequired("Estado es requerido").bind(Parameter::getState, Parameter::setState);
         binder.addStatusChangeListener(event ->{
             boolean isValid = !event.hasValidationErrors();
             boolean hasChanges = binder.hasChanges();
             footer.saveState(hasChanges && isValid); //&& GrantOptions.grantedOption("Parametros"));
         });
-
+        binder.readBean(parameter);
         FormLayout form = new FormLayout();
         form.addClassNames(LumoStyles.Padding.Bottom.L,
                 LumoStyles.Padding.Horizontal.S, LumoStyles.Padding.Top.S);
@@ -266,6 +268,8 @@ public class ParameterView extends SplitViewFrame implements RouterLayout {
         UIUtils.setColSpan(2,descriptionItem);
         FormLayout.FormItem valorItem =  form.addFormItem(txtValue,"Valor");
         UIUtils.setColSpan(2,valorItem);
+        FormLayout.FormItem stateItem = form.addFormItem(state,"Estado");
+        UIUtils.setColSpan(2,stateItem);
 
         return form;
 

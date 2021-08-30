@@ -10,10 +10,13 @@ import com.mindware.ui.components.navigation.drawer.NaviMenu;
 import com.mindware.ui.util.UIUtils;
 import com.mindware.ui.util.css.Overflow;
 import com.mindware.ui.views.Home;
+import com.mindware.ui.views.contract.VariableContractView;
 import com.mindware.ui.views.forms.FormSearchView;
 import com.mindware.ui.views.forms.FormVerifyIdCard;
+import com.mindware.ui.views.contract.TemplateContractView;
 import com.mindware.ui.views.parameter.ParameterView;
 import com.mindware.ui.views.users.UserView;
+import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasElement;
 import com.vaadin.flow.component.UI;
@@ -51,7 +54,6 @@ import java.util.List;
 @PWA(name = "Appform UI", shortName = "Appform UI", iconPath = "images/logo-18.png", backgroundColor = "#5074a4", themeColor = "#5074a4")
 @Viewport("width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes")
 @Route("main")
-
 public class MainLayout extends FlexBoxLayout
 		implements RouterLayout, PageConfigurator, AfterNavigationObserver {
 
@@ -75,7 +77,6 @@ public class MainLayout extends FlexBoxLayout
 	private AppBar appBar;
 
 	public List<Options> optionList = new ArrayList<>();
-
 
 
 	public MainLayout() {
@@ -135,16 +136,27 @@ public class MainLayout extends FlexBoxLayout
 		NaviMenu menu = naviDrawer.getMenu();
 		menu.addNaviItem(VaadinIcon.FILE, "Formularios", FormSearchView.class);
 		menu.addNaviItem(VaadinIcon.FILE, "Verif. C.I.", FormVerifyIdCard.class);
-		if(VaadinSession.getCurrent().getAttribute("rol").toString().equals("ADMINISTRADOR")) {
-			NaviItem personnel = menu.addNaviItem(VaadinIcon.STOP_COG, "Configuracion",
-					null);
-			menu.addNaviItem(personnel, "Parametros", ParameterView.class);
-			menu.addNaviItem(personnel, "Usuarios", UserView.class);
-		}
-		if(VaadinSession.getCurrent().getAttribute("rol").toString().equals("OPERACIONES")) {
-			NaviItem personnel = menu.addNaviItem(VaadinIcon.STOP_COG, "Configuracion",
-					null);
-			menu.addNaviItem(personnel, "Parametros", ParameterView.class);
+
+		if(VaadinSession.getCurrent().getAttribute("rol")!=null) {
+			if (VaadinSession.getCurrent().getAttribute("rol").toString().equals("ADMINISTRADOR")) {
+				NaviItem personnel = menu.addNaviItem(VaadinIcon.STOP_COG, "Configuracion",
+						null);
+				menu.addNaviItem(personnel, "Parametros", ParameterView.class);
+				menu.addNaviItem(personnel, "Usuarios", UserView.class);
+				menu.addNaviItem(personnel, "Plantilla Contratos", TemplateContractView.class);
+				menu.addNaviItem(personnel, "Variables de Contratos", VariableContractView.class);
+			}
+			if (VaadinSession.getCurrent().getAttribute("rol").toString().equals("OPERACIONES")) {
+				NaviItem personnel = menu.addNaviItem(VaadinIcon.STOP_COG, "Configuracion",
+						null);
+				menu.addNaviItem(personnel, "Parametros", ParameterView.class);
+				menu.addNaviItem(personnel, "Plantilla Contratos", TemplateContractView.class);
+				menu.addNaviItem(personnel, "Variables de Contratos", VariableContractView.class);
+			}
+		}else{
+			UIUtils.dialog("Session expirada, ingrese nuevamente","alert").open();
+			UI.getCurrent().getSession().close();
+			UI.getCurrent().navigate("login");
 		}
 
 	}
