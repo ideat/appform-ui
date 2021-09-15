@@ -13,17 +13,19 @@ public class Signatory {
 
     private String idCard;
 
-    private String extension;
-
     private String position;
 
-    private String powerAttorney;
+    private String powerNotary;
 
-    private Date datePowerAttorney;
+    private Date datePowerNotary;
 
     private Integer numberNotary;
 
     private String notaryName;
 
-    private Integer idOffice;
+    private Integer plaza;
+
+    private String tradeRegistration;
+
+    private String active;
 }

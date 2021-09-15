@@ -305,12 +305,12 @@ public class BeneficiaryView extends Dialog {
         btnSelect.setIcon(VaadinIcon.CHECK.create());
         btnSelect.addClickListener(event ->{
             Beneficiary newItem = new Beneficiary();
-            newItem.setFullName(gbageLabDtoList.get(0).getGbagenomb());
-            newItem.setIdCard(gbageLabDtoList.get(0).getGbagendid());
-            newItem.setTelephone(gbageLabDtoList.get(0).getGbagetlfd());
-            newItem.setEconomicActivity(gbageLabDtoList.get(0).getGblabdact());
-            newItem.setNationality(gbageLabDtoList.get(0).getGbagenaci());
-            newItem.setAddress(gbageLabDtoList.get(0).getGbagedir1());
+            newItem.setFullName(gbageLabDto.getGbagenomb());
+            newItem.setIdCard(gbageLabDto.getGbagendid());
+            newItem.setTelephone(gbageLabDto.getGbagetlfd());
+            newItem.setEconomicActivity(gbageLabDto.getGblabdact());
+            newItem.setNationality(gbageLabDto.getGbagenaci());
+            newItem.setAddress(gbageLabDto.getGbagedir1());
             beneficiaryRegisterView = new BeneficiaryRegisterView(newItem,gbconListGlobal);
             Footer footer = new Footer();
             Button save = new Button("Guardar");

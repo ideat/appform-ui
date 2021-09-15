@@ -14,6 +14,7 @@ import com.mindware.ui.views.contract.VariableContractView;
 import com.mindware.ui.views.forms.FormSearchView;
 import com.mindware.ui.views.forms.FormVerifyIdCard;
 import com.mindware.ui.views.contract.TemplateContractView;
+import com.mindware.ui.views.forms.SignatoryView;
 import com.mindware.ui.views.parameter.ParameterView;
 import com.mindware.ui.views.users.UserView;
 import com.vaadin.flow.component.AttachEvent;
@@ -145,6 +146,8 @@ public class MainLayout extends FlexBoxLayout
 				menu.addNaviItem(personnel, "Usuarios", UserView.class);
 				menu.addNaviItem(personnel, "Plantilla Contratos", TemplateContractView.class);
 				menu.addNaviItem(personnel, "Variables de Contratos", VariableContractView.class);
+				menu.addNaviItem(personnel, "Representante Legal", SignatoryView.class);
+
 			}
 			if (VaadinSession.getCurrent().getAttribute("rol").toString().equals("OPERACIONES")) {
 				NaviItem personnel = menu.addNaviItem(VaadinIcon.STOP_COG, "Configuracion",
@@ -152,6 +155,7 @@ public class MainLayout extends FlexBoxLayout
 				menu.addNaviItem(personnel, "Parametros", ParameterView.class);
 				menu.addNaviItem(personnel, "Plantilla Contratos", TemplateContractView.class);
 				menu.addNaviItem(personnel, "Variables de Contratos", VariableContractView.class);
+				menu.addNaviItem(personnel, "Representante Legal", SignatoryView.class);
 			}
 		}else{
 			UIUtils.dialog("Session expirada, ingrese nuevamente","alert").open();

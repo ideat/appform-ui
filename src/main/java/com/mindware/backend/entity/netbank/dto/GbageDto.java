@@ -27,6 +27,10 @@ public class GbageDto {
 
     private String currency;
 
+    private Integer secundaryCage; //Codigo del tutor en caso de menores o codigo cliente manejo conjunto
+
+    private String typeAccount;
+
     public LocalDate getGbagefregConvert(){
         return gbagefreg.toInstant()
                 .atZone(ZoneId.of("UTC"))

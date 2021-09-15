@@ -35,8 +35,12 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.ParentLayout;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLayout;
+import com.vaadin.flow.server.VaadinSession;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -226,21 +230,39 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
                 if (gbageDto.getAccountName().equals("VARIOS")) {
 
                     if(taskSelect.getValue().equals("BANCA DIGITAL")){
-                        openDialog(gbageDto.getGbagecage(),"",  gbageDto.getAccountName(), taskSelect.getValue());
+                        openDialog(gbageDto.getGbagecage(),"",  gbageDto.getAccountName(), taskSelect.getValue(),"NO");
                     }
                     if(taskSelect.getValue().equals("SERVICIOS TD")){
-                        openDialog(gbageDto.getGbagecage(),"",  gbageDto.getAccountName(), taskSelect.getValue());
+                        openDialog(gbageDto.getGbagecage(),"",  gbageDto.getAccountName(), taskSelect.getValue(),"NO");
                     }
 
                 } else {
 
-                    if (gbageDto.getAccountName().equals("CAJA-AHORRO") || gbageDto.getAccountName().equals("DPF")) {
+                    if (gbageDto.getAccountName().equals("CAJA-AHORRO") ) {
                         if(taskSelect.getValue().equals("CONTRATO")){
 
                         }else {
-                            openDialog(gbageDto.getGbagecage(), gbageDto.getAccountCode(), gbageDto.getAccountName(), taskSelect.getValue());
+                            LocalDate currentDate = LocalDate.now();
+                            LocalDate birthDate = gbageDto.getGbagefnac().toInstant()
+                                    .atZone(ZoneId.systemDefault())
+                                    .toLocalDate();
+                            Period period = Period.between(currentDate,birthDate);
+                            int years = Math.abs(period.getYears());
+                            if(years < 18){
+                                openDialog(gbageDto.getSecundaryCage(), gbageDto.getAccountCode(), gbageDto.getAccountName(), taskSelect.getValue(),"SI");
+                            }else{
+                                if(gbageDto.getSecundaryCage().equals(gbageDto.getGbagecage())){
+                                    openDialog(gbageDto.getGbagecage(), gbageDto.getAccountCode(), gbageDto.getAccountName(), taskSelect.getValue(),"NO");
+                                }else {
+                                    openDialog(gbageDto.getSecundaryCage(), gbageDto.getAccountCode(), gbageDto.getAccountName(), taskSelect.getValue(), "SI");
+                                }
+                            }
+
                         }
+                    }else if (gbageDto.getAccountName().equals("DPF") && !taskSelect.getValue().equals("CONTRATO")){
+                        openDialog(gbageDto.getGbagecage(), gbageDto.getAccountCode(), gbageDto.getAccountName(), taskSelect.getValue(),"NO");
                     }
+
                 }
             }else{
                 UIUtils.dialog("Seleccione una tarea","info").open();
@@ -251,16 +273,57 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
            if( taskSelect.getValue()!=null && !taskSelect.getValue().isEmpty()) {
                if(taskSelect.getValue().equals("FORMULARIO APERTURA")) {
                    try {
-                       FormReportView report = new FormReportView(gbageDto.getGbagecage(), gbageDto.getAccountCode(),
-                               taskSelect.getValue(), gbageDto.getAccountName(), formsRestTemplate, "", "",contractRestTemplate);
+                       FormReportView report=null;
+                       if(gbageDto.getAccountName().equals("CAJA-AHORRO")) {
+                           LocalDate currentDate = LocalDate.now();
+                           LocalDate birthDate = gbageDto.getGbagefnac().toInstant()
+                                   .atZone(ZoneId.systemDefault())
+                                   .toLocalDate();
+                           Period period = Period.between(currentDate,birthDate);
+                           int years = Math.abs(period.getYears());
+                           if(years < 18){
+                               report = new FormReportView(gbageDto.getSecundaryCage(), gbageDto.getAccountCode(),
+                                       taskSelect.getValue(), gbageDto.getAccountName(), formsRestTemplate, "", "", contractRestTemplate, "SI");
+                           }else{
+                               if(gbageDto.getSecundaryCage().equals(gbageDto.getGbagecage())) {
+                                   report = new FormReportView(gbageDto.getGbagecage(), gbageDto.getAccountCode(),
+                                           taskSelect.getValue(), gbageDto.getAccountName(), formsRestTemplate, "", "", contractRestTemplate, "NO");
+                               }else{
+                                   report = new FormReportView(gbageDto.getSecundaryCage(), gbageDto.getAccountCode(),
+                                           taskSelect.getValue(), gbageDto.getAccountName(), formsRestTemplate, "", "", contractRestTemplate, "SI");
+                               }
+                           }
+
+                       }else{
+                           report = new FormReportView(gbageDto.getGbagecage(), gbageDto.getAccountCode(),
+                                   taskSelect.getValue(), gbageDto.getAccountName(), formsRestTemplate, "", "",contractRestTemplate,"NO");
+                       }
                        report.open();
                    } catch (Exception e) {
 
                    }
                }else if(taskSelect.getValue().equals("CONTRATO")){
+                   FormReportView report = null;
+                   String login = VaadinSession.getCurrent().getAttribute("login").toString();
                    try {
-                       FormReportView report = new FormReportView(gbageDto.getGbagecage(), gbageDto.getAccountCode(),
-                               taskSelect.getValue(), gbageDto.getAccountName(), formsRestTemplate, "", "", contractRestTemplate);
+                       if(gbageDto.getAccountName().equals("CAJA-AHORRO")) {
+                           LocalDate currentDate = LocalDate.now();
+                           LocalDate birthDate = gbageDto.getGbagefnac().toInstant()
+                                   .atZone(ZoneId.systemDefault())
+                                   .toLocalDate();
+                           Period period = Period.between(currentDate,birthDate);
+                           int years = Math.abs(period.getYears());
+                           if(years < 18){
+                               report = new FormReportView(gbageDto.getSecundaryCage(), gbageDto.getAccountCode(),
+                                       taskSelect.getValue(), gbageDto.getAccountName(), formsRestTemplate, gbageDto.getTypeAccount().trim(), login, contractRestTemplate, "SI");
+                           }else{
+                               report = new FormReportView(gbageDto.getGbagecage(), gbageDto.getAccountCode(),
+                                       taskSelect.getValue(), gbageDto.getAccountName(), formsRestTemplate, gbageDto.getTypeAccount().trim(), login, contractRestTemplate, "NO");
+                           }
+                       }else {
+                           report = new FormReportView(gbageDto.getGbagecage(), gbageDto.getAccountCode(),
+                                   taskSelect.getValue(), gbageDto.getAccountName(), formsRestTemplate, "", login, contractRestTemplate, "NO");
+                       }
                        report.open();
                    }catch (Exception e){
 
@@ -279,13 +342,13 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
         return layout;
     }
 
-    private void openDialog(Integer cage, String accountCode, String categoryTypeForm, String nameTypeForm){
+    private void openDialog(Integer cage, String accountCode, String categoryTypeForm, String nameTypeForm, String isTutor){
         if(dialogFormSavingBank != null){
             dialogFormSavingBank.close();
         }
 
         if(categoryTypeForm.equals("CAJA-AHORRO") || categoryTypeForm.equals("DPF")) {
-            DataFormDto dataFormDto = formsRestTemplate.findDataFormDtoFormSavingBoxByCageAndAccount(cage, accountCode,categoryTypeForm);
+            DataFormDto dataFormDto = formsRestTemplate.findDataFormDtoFormSavingBoxByCageAndAccount(cage, accountCode,categoryTypeForm,isTutor);
             dialogFormSavingBank = new DialogFormSavingBank(accountCode, categoryTypeForm, nameTypeForm,
                     dataFormDto, formsRestTemplate, gbageLabDtoRestTemplate, gbconRestTemplate);
             dialogFormSavingBank.open();

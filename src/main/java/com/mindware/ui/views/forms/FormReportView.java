@@ -20,6 +20,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.server.StreamResource;
+import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.theme.lumo.Lumo;
 
 import java.io.ByteArrayInputStream;
@@ -43,7 +44,8 @@ public class FormReportView extends Dialog  {
 
     public FormReportView(Integer codeClient, String idAccount, String typeForm,
                           String categoryTypeForm, FormsRestTemplate restTemplate,
-                          String others, String login, ContractRestTemplate contractRestTemplate){
+                          String others, String login, ContractRestTemplate contractRestTemplate,
+                          String isTutor){
         setDraggable(true);
         setModal(false);
         setResizable(true);
@@ -77,14 +79,15 @@ public class FormReportView extends Dialog  {
         if(categoryTypeForm.equals("CAJA-AHORRO") || categoryTypeForm.equals("DPF")){
             if(typeForm.equals("FORMULARIO APERTURA")) {
                 try {
-                    file = restTemplate.report(codeClient, idAccount, typeForm, categoryTypeForm);
+                    file = restTemplate.report(codeClient, idAccount, typeForm, categoryTypeForm, isTutor);
                 } catch (Exception e) {
                     UIUtils.dialog("Error:" + e.getMessage(), "alert").open();
 
                 }
             }else{
                 try {
-                    file = contractRestTemplate.contract(codeClient, idAccount, typeForm, categoryTypeForm);
+                    file = contractRestTemplate.contract(codeClient, idAccount, typeForm, categoryTypeForm,isTutor,
+                            others);
                 }catch (Exception e){
                     UIUtils.dialog("Error:" + e.getMessage(), "alert").open();
 

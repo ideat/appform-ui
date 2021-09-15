@@ -30,13 +30,14 @@ public class FormsRestTemplate {
         return response.getBody();
     }
 
-    public DataFormDto findDataFormDtoFormSavingBoxByCageAndAccount(Integer cage, String account, String category){
+    public DataFormDto findDataFormDtoFormSavingBoxByCageAndAccount(Integer cage, String account, String category, String isTutor){
         final String uri = url + "/form/findDataFormDtoFormSavingBoxOrDpfByCageAndAccount";
 
         HttpHeaders headers = HeaderJwt.getHeader();
         headers.add("cage",cage.toString());
         headers.add("account",account);
         headers.add("category_type_form",category);
+        headers.add("is-tutor",isTutor);
         HttpEntity<DataFormDto> entity = new HttpEntity<>(headers);
 
         ResponseEntity<DataFormDto> response =  restTemplate.exchange(uri, HttpMethod.GET, entity, DataFormDto.class);
@@ -117,7 +118,7 @@ public class FormsRestTemplate {
 
     }
 
-    public byte[] report(Integer codeClient, String idAccount, String typeForm, String categoryTypeForm){
+    public byte[] report(Integer codeClient, String idAccount, String typeForm, String categoryTypeForm, String isTutor){
         final String uri = url + "/form/getFormSavingBankAndDpfReport";
 
         HttpHeaders headers = HeaderJwt.getHeader();
@@ -125,6 +126,7 @@ public class FormsRestTemplate {
         headers.add("code_client",codeClient.toString());
         headers.add("category_type_form",categoryTypeForm);
         headers.add("type_form",typeForm);
+        headers.add("is-tutor",isTutor);
         HttpEntity<byte[]> entity = new HttpEntity<>(headers);
 
         ResponseEntity<byte[]> response = restTemplate.exchange(uri,HttpMethod.GET,entity,byte[].class);

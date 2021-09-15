@@ -91,6 +91,7 @@ public class LoginView extends VerticalLayout {
                         VaadinSession.getCurrent().setAttribute("current-date",gbpmt.getGbpmtfdia());
                         VaadinSession.getCurrent().setAttribute("rol",users.getRolName());
                         VaadinSession.getCurrent().setAttribute("email",users.getEmail());
+                        VaadinSession.getCurrent().setAttribute("plaza",adusrOfi.getAdusrplaz());
 
                         UI.getCurrent().navigate("main");
                     }else{
