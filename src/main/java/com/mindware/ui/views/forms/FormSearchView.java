@@ -13,6 +13,7 @@ import com.mindware.ui.MainLayout;
 import com.mindware.ui.components.FlexBoxLayout;
 import com.mindware.ui.layout.size.Horizontal;
 import com.mindware.ui.layout.size.Top;
+import com.mindware.ui.util.DownloadLink;
 import com.mindware.ui.util.UIUtils;
 import com.mindware.ui.util.css.BoxSizing;
 import com.mindware.ui.util.css.Shadow;
@@ -21,6 +22,7 @@ import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -35,9 +37,14 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.ParentLayout;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLayout;
+import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.VaadinSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.vaadin.olli.FileDownloadWrapper;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
@@ -200,11 +207,36 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
                 .setAutoWidth(true);
         grid.addColumn(new ComponentRenderer<>(this::createForm))
                 .setFlexGrow(0).setAutoWidth(true);
-
+        grid.addColumn(new ComponentRenderer<>(this::createDownloadLink))
+                .setFlexGrow(0).setAutoWidth(true);
         return grid;
     }
 
-    private Component createForm(GbageDto gbageDto){
+    private Component createDownloadLink(GbageDto gbageDto){
+        Div content = new Div();
+
+        if(gbageDto.getAccountName()!=null && (gbageDto.getAccountName().equals("CAJA-AHORRO") || gbageDto.getAccountName().equals("DPF"))){
+
+            String nameTemplate = null;
+            try {
+                nameTemplate = contractRestTemplate.getTemplateContract(gbageDto.getGbagecage(), gbageDto.getAccountCode(),
+                        "CONTRATO", gbageDto.getAccountName(), "NO", gbageDto.getTypeAccount());
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
+            if(!nameTemplate.equals("invalid")) {
+                File in = new File(nameTemplate);
+                DownloadLink downloadLink = new DownloadLink(in);
+                content = new Div(downloadLink);
+            }
+
+
+        }
+
+        return content;
+    }
+
+    private Component createForm(GbageDto gbageDto) {
         Button btnTask = new Button("Crear");
         btnTask.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_PRIMARY);
         btnTask.setIcon(VaadinIcon.FILE_ADD.create());
@@ -212,6 +244,10 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
         Button btnPrint = new Button();
         btnPrint.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_CONTRAST);
         btnPrint.setIcon(VaadinIcon.PRINT.create());
+
+//        Button btnDownloadTemplate = new Button();
+//        btnDownloadTemplate.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
+//        btnDownloadTemplate.setIcon(VaadinIcon.DOWNLOAD_ALT.create());
 
         Select<String> taskSelect = new Select<>();
         if(gbageDto.getAccountName().equals("VARIOS")){
@@ -223,7 +259,6 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
             taskSelect.setPlaceholder("Seleccione Tarea");
             btnPrint.setVisible(true);
         }
-
 
         btnTask.addClickListener(click -> {
             if(!taskSelect.isEmpty()) {
@@ -336,6 +371,25 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
            }
         });
 
+//        if(gbageDto.getAccountCode()!=null && !gbageDto.getAccountCode().equals("")) {
+//            String nameTemplate = null;
+//            try {
+//                nameTemplate = contractRestTemplate.getTemplateContract(gbageDto.getGbagecage(), gbageDto.getAccountCode(),
+//                        taskSelect.getValue(), gbageDto.getAccountName(), "NO", gbageDto.getTypeAccount());
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            File in = new File(nameTemplate);
+//
+//            StreamResource sr = new StreamResource(in.getName(), () -> new ByteArrayInputStream("template".getBytes()));
+//            FileDownloadWrapper buttonWrapper = new FileDownloadWrapper(sr);
+//            buttonWrapper.wrapComponent(btnDownloadTemplate);
+//        }
+//        btnDownloadTemplate.addClickListener(event -> {
+//
+//
+//        });
+
         HorizontalLayout layout = new HorizontalLayout();
         layout.add(taskSelect,btnTask,btnPrint);
 
@@ -375,5 +429,6 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
         }
 
     }
+
 
 }
