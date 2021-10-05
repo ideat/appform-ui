@@ -207,7 +207,7 @@ public class FormVerifyIdCard extends SplitViewFrame implements RouterLayout {
         btnPrint.addClickListener(click -> {
             if(forms.getIdUser()!=null) {
                 FormReportView report = new FormReportView(0, "",
-                        "VERIF. SEGIP", "VARIOS", formsRestTemplate, forms.getId(), forms.getIdUser(), null,"NO");
+                        "VERIF. SEGIP", "VARIOS", formsRestTemplate, forms.getId(), forms.getIdUser(), null,"NO","NO");
                 report.open();
             }else{
                 UIUtils.dialog("Edite el formulario y guarde para que se asigne el formulario a su usuario","alert").open();

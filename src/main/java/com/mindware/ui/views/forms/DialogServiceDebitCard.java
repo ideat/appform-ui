@@ -378,7 +378,7 @@ public class DialogServiceDebitCard extends Dialog {
 
         btnPrint.addClickListener(click -> {
             FormReportView report = new FormReportView(formsDebitCard.getIdClient(),accountServiceOperation.getId(),
-                    formsDebitCard.getNameTypeForm(),formsDebitCard.getCategoryTypeForm(),formsRestTemplateGlobal,"","",null,"NO");
+                    formsDebitCard.getNameTypeForm(),formsDebitCard.getCategoryTypeForm(),formsRestTemplateGlobal,"","",null,"NO","NO");
             report.open();
         });
 
@@ -399,15 +399,13 @@ public class DialogServiceDebitCard extends Dialog {
 
                     formsRestTemplateGlobal.create(formsDebitCard);
                     UIUtils.showNotification("Preparando reporte");
-
-
                 }
             }else{
                 UIUtils.dialog("Registre la tarjeta guardando los cambios","alert").open();
                 return;
             }
             FormReportView report = new FormReportView(formsDebitCard.getIdClient(),accountServiceOperation.getId(),
-                    formsDebitCard.getNameTypeForm(),formsDebitCard.getCategoryTypeForm(),formsRestTemplateGlobal,"DELIVER","",null,"NO");
+                    formsDebitCard.getNameTypeForm(),formsDebitCard.getCategoryTypeForm(),formsRestTemplateGlobal,"DELIVER","",null,"NO","NO");
             report.open();
 
         });

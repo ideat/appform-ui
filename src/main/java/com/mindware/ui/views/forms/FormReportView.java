@@ -45,7 +45,7 @@ public class FormReportView extends Dialog  {
     public FormReportView(Integer codeClient, String idAccount, String typeForm,
                           String categoryTypeForm, FormsRestTemplate restTemplate,
                           String others, String login, ContractRestTemplate contractRestTemplate,
-                          String isTutor){
+                          String isTutor, String isYunger){
         setDraggable(true);
         setModal(false);
         setResizable(true);
@@ -58,7 +58,7 @@ public class FormReportView extends Dialog  {
         getElement().setAttribute("aria-labelledby", "dialog-title");
 
         // Header
-        H2 title = new H2("Formulario Beneficiarios");
+        H2 title = new H2(typeForm + " - " + categoryTypeForm);
         title.addClassName("dialog-title");
 
         min = new Button(VaadinIcon.DOWNLOAD_ALT.create());
@@ -87,7 +87,7 @@ public class FormReportView extends Dialog  {
             }else{
                 try {
                     file = contractRestTemplate.contract(codeClient, idAccount, typeForm, categoryTypeForm,isTutor,
-                            others);
+                            others, isYunger);
                 }catch (Exception e){
                     UIUtils.dialog("Error:" + e.getMessage(), "alert").open();
 

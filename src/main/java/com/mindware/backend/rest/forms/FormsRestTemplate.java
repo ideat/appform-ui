@@ -3,6 +3,7 @@ package com.mindware.backend.rest.forms;
 import com.mindware.backend.entity.Forms;
 import com.mindware.backend.entity.netbank.dto.DataFormDto;
 import com.mindware.backend.util.HeaderJwt;
+import com.vaadin.flow.server.VaadinSession;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -136,12 +137,13 @@ public class FormsRestTemplate {
 
     public byte[] reportDigitalBank(Integer codeClient, String idAccountServiceOperation, String typeForm, String categoryTypeForm){
         final String uri = url + "/form/getFormDigitalBankDtoReport";
-
+        String officeName = VaadinSession.getCurrent().getAttribute("name-office").toString();
         HttpHeaders headers = HeaderJwt.getHeader();
         headers.add("id_account_service_operation",idAccountServiceOperation);
         headers.add("code_client",codeClient.toString());
         headers.add("category_type_form",categoryTypeForm);
         headers.add("type_form",typeForm);
+        headers.add("name-office",officeName);
         HttpEntity<byte[]> entity = new HttpEntity<>(headers);
 
         ResponseEntity<byte[]> response = restTemplate.exchange(uri,HttpMethod.GET,entity,byte[].class);
@@ -151,12 +153,14 @@ public class FormsRestTemplate {
 
     public byte[] reportDebitCard(Integer codeClient, String idAccountServiceOperation, String typeForm, String categoryTypeForm){
         final String uri = url + "/form/getFormDebitCardDtoReport";
+        String officeName = VaadinSession.getCurrent().getAttribute("name-office").toString();
 
         HttpHeaders headers = HeaderJwt.getHeader();
         headers.add("id_account_service_operation",idAccountServiceOperation);
         headers.add("code_client",codeClient.toString());
         headers.add("category_type_form",categoryTypeForm);
         headers.add("type_form",typeForm);
+        headers.add("name-office",officeName);
         HttpEntity<byte[]> entity = new HttpEntity<>(headers);
 
         ResponseEntity<byte[]> response = restTemplate.exchange(uri,HttpMethod.GET,entity,byte[].class);
@@ -166,12 +170,14 @@ public class FormsRestTemplate {
 
     public byte[] reportDeliverDebitCard(Integer codeClient, String idAccountServiceOperation, String typeForm, String categoryTypeForm){
         final String uri = url + "/form/getFormDeliverDebitCardReport";
+        String officeName = VaadinSession.getCurrent().getAttribute("name-office").toString();
 
         HttpHeaders headers = HeaderJwt.getHeader();
         headers.add("id_account_service_operation",idAccountServiceOperation);
         headers.add("code_client",codeClient.toString());
         headers.add("category_type_form",categoryTypeForm);
         headers.add("type_form",typeForm);
+        headers.add("name-office",officeName);
         HttpEntity<byte[]> entity = new HttpEntity<>(headers);
 
         ResponseEntity<byte[]> response = restTemplate.exchange(uri,HttpMethod.GET,entity,byte[].class);

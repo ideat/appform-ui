@@ -146,7 +146,7 @@ public class MainLayout extends FlexBoxLayout
 				menu.addNaviItem(personnel, "Usuarios", UserView.class);
 				menu.addNaviItem(personnel, "Plantilla Contratos", TemplateContractView.class);
 				menu.addNaviItem(personnel, "Variables de Contratos", VariableContractView.class);
-				menu.addNaviItem(personnel, "Representante Legal", SignatoryView.class);
+//				menu.addNaviItem(personnel, "Representante Legal", SignatoryView.class);
 
 			}
 			if (VaadinSession.getCurrent().getAttribute("rol").toString().equals("OPERACIONES")) {
@@ -155,7 +155,7 @@ public class MainLayout extends FlexBoxLayout
 				menu.addNaviItem(personnel, "Parametros", ParameterView.class);
 				menu.addNaviItem(personnel, "Plantilla Contratos", TemplateContractView.class);
 				menu.addNaviItem(personnel, "Variables de Contratos", VariableContractView.class);
-				menu.addNaviItem(personnel, "Representante Legal", SignatoryView.class);
+//				menu.addNaviItem(personnel, "Representante Legal", SignatoryView.class);
 			}
 		}else{
 			UIUtils.dialog("Session expirada, ingrese nuevamente","alert").open();

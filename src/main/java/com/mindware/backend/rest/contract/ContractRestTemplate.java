@@ -26,7 +26,7 @@ public class ContractRestTemplate {
     RestTemplate restTemplate = new RestTemplate();
 
     public byte[] contract(Integer codeClient, String account, String typeForm,
-                           String categoryTypeForm, String isTutor, String typeAccount){
+                           String categoryTypeForm, String isTutor, String typeAccount, String isYunger){
         final String uri = url + "/contract/getFileContract";
 
         HttpHeaders headers = HeaderJwt.getHeader();
@@ -38,6 +38,7 @@ public class ContractRestTemplate {
         headers.add("login", VaadinSession.getCurrent().getAttribute("login").toString());
         headers.add("plaza", VaadinSession.getCurrent().getAttribute("plaza").toString());
         headers.add("type-account", typeAccount);
+        headers.add("is-yunger",isYunger);
 
         HttpEntity<byte[]> entity = new HttpEntity<>(headers);
 
@@ -47,7 +48,7 @@ public class ContractRestTemplate {
     }
 
     public String getTemplateContract(Integer codeClient, String account, String typeForm,
-                                    String categoryTypeForm, String isTutor, String typeAccount) throws IOException {
+                                    String categoryTypeForm, String isTutor, String typeAccount, String isYunger) throws IOException {
         final String uri = url + "/contract/getTemplateContract";
 
         HttpHeaders headers = HeaderJwt.getHeader();
@@ -59,6 +60,7 @@ public class ContractRestTemplate {
         headers.add("login", VaadinSession.getCurrent().getAttribute("login").toString());
         headers.add("plaza", VaadinSession.getCurrent().getAttribute("plaza").toString());
         headers.add("type-account", typeAccount);
+        headers.add("is-yunger",isYunger);
 
         HttpEntity<byte[]> entity = new HttpEntity<>(headers);
 

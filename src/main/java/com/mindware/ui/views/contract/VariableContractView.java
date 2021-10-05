@@ -100,7 +100,7 @@ public class VariableContractView extends SplitViewFrame implements RouterLayout
 
         HorizontalLayout topLayout = new HorizontalLayout();
         topLayout.setWidth("100%");
-        topLayout.add(btnNew);
+//        topLayout.add(btnNew);
         topLayout.setVerticalComponentAlignment(FlexComponent.Alignment.END,btnNew);
         topLayout.setSpacing(true);
         topLayout.setPadding(true);

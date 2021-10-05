@@ -219,8 +219,14 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
 
             String nameTemplate = null;
             try {
-                nameTemplate = contractRestTemplate.getTemplateContract(gbageDto.getGbagecage(), gbageDto.getAccountCode(),
-                        "CONTRATO", gbageDto.getAccountName(), "NO", gbageDto.getTypeAccount());
+                int year = getYears(gbageDto);
+                if(year < 18) {
+                    nameTemplate = contractRestTemplate.getTemplateContract(gbageDto.getGbagecage(), gbageDto.getAccountCode(),
+                            "CONTRATO", gbageDto.getAccountName(), "NO", gbageDto.getTypeAccount(),"SI");
+                }else{
+                    nameTemplate = contractRestTemplate.getTemplateContract(gbageDto.getGbagecage(), gbageDto.getAccountCode(),
+                            "CONTRATO", gbageDto.getAccountName(), "NO", gbageDto.getTypeAccount(),"NO");
+                }
             } catch (IOException ioException) {
                 ioException.printStackTrace();
             }
@@ -277,12 +283,7 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
                         if(taskSelect.getValue().equals("CONTRATO")){
 
                         }else {
-                            LocalDate currentDate = LocalDate.now();
-                            LocalDate birthDate = gbageDto.getGbagefnac().toInstant()
-                                    .atZone(ZoneId.systemDefault())
-                                    .toLocalDate();
-                            Period period = Period.between(currentDate,birthDate);
-                            int years = Math.abs(period.getYears());
+                            int years = getYears(gbageDto);
                             if(years < 18){
                                 openDialog(gbageDto.getSecundaryCage(), gbageDto.getAccountCode(), gbageDto.getAccountName(), taskSelect.getValue(),"SI");
                             }else{
@@ -310,28 +311,23 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
                    try {
                        FormReportView report=null;
                        if(gbageDto.getAccountName().equals("CAJA-AHORRO")) {
-                           LocalDate currentDate = LocalDate.now();
-                           LocalDate birthDate = gbageDto.getGbagefnac().toInstant()
-                                   .atZone(ZoneId.systemDefault())
-                                   .toLocalDate();
-                           Period period = Period.between(currentDate,birthDate);
-                           int years = Math.abs(period.getYears());
+                           int years = getYears(gbageDto);
                            if(years < 18){
                                report = new FormReportView(gbageDto.getSecundaryCage(), gbageDto.getAccountCode(),
-                                       taskSelect.getValue(), gbageDto.getAccountName(), formsRestTemplate, "", "", contractRestTemplate, "SI");
+                                       taskSelect.getValue(), gbageDto.getAccountName(), formsRestTemplate, "", "", contractRestTemplate, "SI","SI");
                            }else{
                                if(gbageDto.getSecundaryCage().equals(gbageDto.getGbagecage())) {
                                    report = new FormReportView(gbageDto.getGbagecage(), gbageDto.getAccountCode(),
-                                           taskSelect.getValue(), gbageDto.getAccountName(), formsRestTemplate, "", "", contractRestTemplate, "NO");
+                                           taskSelect.getValue(), gbageDto.getAccountName(), formsRestTemplate, "", "", contractRestTemplate, "NO","NO");
                                }else{
                                    report = new FormReportView(gbageDto.getSecundaryCage(), gbageDto.getAccountCode(),
-                                           taskSelect.getValue(), gbageDto.getAccountName(), formsRestTemplate, "", "", contractRestTemplate, "SI");
+                                           taskSelect.getValue(), gbageDto.getAccountName(), formsRestTemplate, "", "", contractRestTemplate, "SI","NO");
                                }
                            }
 
                        }else{
                            report = new FormReportView(gbageDto.getGbagecage(), gbageDto.getAccountCode(),
-                                   taskSelect.getValue(), gbageDto.getAccountName(), formsRestTemplate, "", "",contractRestTemplate,"NO");
+                                   taskSelect.getValue(), gbageDto.getAccountName(), formsRestTemplate, "", "",contractRestTemplate,"NO","NO");
                        }
                        report.open();
                    } catch (Exception e) {
@@ -342,22 +338,17 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
                    String login = VaadinSession.getCurrent().getAttribute("login").toString();
                    try {
                        if(gbageDto.getAccountName().equals("CAJA-AHORRO")) {
-                           LocalDate currentDate = LocalDate.now();
-                           LocalDate birthDate = gbageDto.getGbagefnac().toInstant()
-                                   .atZone(ZoneId.systemDefault())
-                                   .toLocalDate();
-                           Period period = Period.between(currentDate,birthDate);
-                           int years = Math.abs(period.getYears());
+                           int years = getYears(gbageDto);
                            if(years < 18){
                                report = new FormReportView(gbageDto.getSecundaryCage(), gbageDto.getAccountCode(),
-                                       taskSelect.getValue(), gbageDto.getAccountName(), formsRestTemplate, gbageDto.getTypeAccount().trim(), login, contractRestTemplate, "SI");
+                                       taskSelect.getValue(), gbageDto.getAccountName(), formsRestTemplate, gbageDto.getTypeAccount().trim(), login, contractRestTemplate, "SI","SI");
                            }else{
                                report = new FormReportView(gbageDto.getGbagecage(), gbageDto.getAccountCode(),
-                                       taskSelect.getValue(), gbageDto.getAccountName(), formsRestTemplate, gbageDto.getTypeAccount().trim(), login, contractRestTemplate, "NO");
+                                       taskSelect.getValue(), gbageDto.getAccountName(), formsRestTemplate, gbageDto.getTypeAccount().trim(), login, contractRestTemplate, "NO","NO");
                            }
                        }else {
                            report = new FormReportView(gbageDto.getGbagecage(), gbageDto.getAccountCode(),
-                                   taskSelect.getValue(), gbageDto.getAccountName(), formsRestTemplate, "", login, contractRestTemplate, "NO");
+                                   taskSelect.getValue(), gbageDto.getAccountName(), formsRestTemplate, "", login, contractRestTemplate, "NO","NO");
                        }
                        report.open();
                    }catch (Exception e){
@@ -394,6 +385,15 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
         layout.add(taskSelect,btnTask,btnPrint);
 
         return layout;
+    }
+
+    private int getYears(GbageDto gbageDto) {
+        LocalDate currentDate = LocalDate.now();
+        LocalDate birthDate = gbageDto.getGbagefnac().toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
+        Period period = Period.between(currentDate, birthDate);
+        return Math.abs(period.getYears());
     }
 
     private void openDialog(Integer cage, String accountCode, String categoryTypeForm, String nameTypeForm, String isTutor){
