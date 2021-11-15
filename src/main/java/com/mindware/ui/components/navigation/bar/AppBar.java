@@ -120,6 +120,7 @@ public class AppBar extends FlexBoxLayout {
 //		contextMenu.addItem("Settings",
 //				e -> Notification.show("Not implemented yet.", 3000,
 //						Notification.Position.BOTTOM_CENTER));
+		contextMenu.addItem("Version: " + VaadinSession.getCurrent().getAttribute("version").toString());
 		contextMenu.addItem("Cerrar sesion",
 				e -> {
 					UI.getCurrent().navigate("login");
