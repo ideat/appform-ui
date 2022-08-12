@@ -110,8 +110,6 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
         TextField textToSearch = new TextField();
         textToSearch.setValueChangeMode(ValueChangeMode.EAGER);
 
-
-
         Button btnSearch = new Button("Buscar", new Icon(VaadinIcon.SEARCH));
 
         btnSearch.addClickListener(click -> {
