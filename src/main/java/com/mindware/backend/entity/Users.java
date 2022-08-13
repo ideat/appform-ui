@@ -31,6 +31,8 @@ public class Users {
 
     private Date createDate;
 
+    private String adUser;
+
     public String getInitials(){
         if(fullName!=null) {
             String[] arr1 = fullName.split(" ");

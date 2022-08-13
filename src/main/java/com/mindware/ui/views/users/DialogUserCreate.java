@@ -59,6 +59,8 @@ public class DialogUserCreate extends Dialog {
     private TextField lastNames;
     private TextField email;
 
+    private TextField adUser;
+
     private AdusrOfiRestTemplate adusrOfiRestTemplateGlobal;
 
     public DialogUserCreate(UserRestTemplate restTemplate, Users user, PrepareMail prepareMail, AdusrOfiRestTemplate adusrOfiRestTemplate){
@@ -155,6 +157,10 @@ public class DialogUserCreate extends Dialog {
             findUserCore();
         }).addEventData("element.value").setFilter("event.keyCode == 13 || event.keyCode == 9");
 
+        adUser = new TextField();
+        adUser.setWidth("100%");
+        adUser.setRequired(true);
+        adUser.setRequiredIndicatorVisible(true);
 
         names = new TextField();
         names.setWidth("100%");
@@ -205,15 +211,28 @@ public class DialogUserCreate extends Dialog {
         });
 
         binder = new BeanValidationBinder<>(Users.class);
-        binder.forField(login).asRequired("Login es requerido").bind(Users::getLogin,Users::setLogin);
-        binder.forField(names).asRequired("Nombre es requerido").bind(Users::getFullName,Users::setFullName);
-        binder.forField(state).asRequired("Estado es requerido").bind(Users::getState,Users::setState);
-        binder.forField(rols).asRequired("Rol es requerido").bind(Users::getRolName,Users::setRolName);
-        binder.forField(numDaysValidity).asRequired("Dias de Validez es requerido")
+        binder.forField(login)
+                .asRequired("Login es requerido")
+                .bind(Users::getLogin,Users::setLogin);
+        binder.forField(adUser)
+                .asRequired("Usuario Active Directory es requerido")
+                .bind(Users::getAdUser,Users::setAdUser);
+        binder.forField(names)
+                .asRequired("Nombre es requerido")
+                .bind(Users::getFullName,Users::setFullName);
+        binder.forField(state)
+                .asRequired("Estado es requerido")
+                .bind(Users::getState,Users::setState);
+        binder.forField(rols)
+                .asRequired("Rol es requerido")
+                .bind(Users::getRolName,Users::setRolName);
+        binder.forField(numDaysValidity)
+                .asRequired("Dias de Validez es requerido")
                 .withConverter(new Util.DoubleToIntegerConverter())
                 .withValidator(value -> value.intValue()>=1,"Numero de dias no puede ser menor a 1")
                 .bind(Users::getNumDaysValidity,Users::setNumDaysValidity);
-        binder.forField(email).asRequired("Email es requerido")
+        binder.forField(email)
+                .asRequired("Email es requerido")
                 .withValidator(new EmailValidator("Correo invalido"))
                 .bind(Users::getEmail,Users::setEmail);
 
@@ -230,6 +249,7 @@ public class DialogUserCreate extends Dialog {
         );
 
         formLayout.addFormItem(login,"Login");
+        formLayout.addFormItem(adUser,"Usuario Active Directory");
         formLayout.addFormItem(names,"Nombres");
         formLayout.addFormItem(state,"Estado Usuario");
         formLayout.addFormItem(rols,"Rol");
