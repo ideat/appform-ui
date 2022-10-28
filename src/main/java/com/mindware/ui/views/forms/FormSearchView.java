@@ -1,6 +1,7 @@
 package com.mindware.ui.views.forms;
 
 import com.mindware.backend.entity.Parameter;
+import com.mindware.backend.entity.dto.FormToSelectReportDto;
 import com.mindware.backend.entity.netbank.dto.DataFormDto;
 import com.mindware.backend.entity.netbank.dto.GbageDto;
 import com.mindware.backend.rest.contract.ContractRestTemplate;
@@ -22,6 +23,7 @@ import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -39,6 +41,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLayout;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.VaadinSession;
+import dev.mett.vaadin.tooltip.Tooltips;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.olli.FileDownloadWrapper;
 
@@ -80,6 +83,8 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
     private DialogFormSavingBank dialogFormSavingBank;
     private DialogDigitalBanking dialogDigitalBanking;
     private DialogServiceDebitCard dialogServiceDebitCard;
+
+    private DialogFormToSelectReport dialogFormToSelectReport;
 
     @Override
     protected void onAttach(AttachEvent attachment){
@@ -153,6 +158,7 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
     private Grid createGridResult(){
         Grid<GbageDto> grid = new Grid<>();
         grid.setSizeFull();
+        grid.addThemeVariants(GridVariant.LUMO_COMPACT,GridVariant.LUMO_WRAP_CELL_CONTENT);
         grid.setItems(gbageDtoList);
 
         grid.addColumn(GbageDto::getGbagecage)
@@ -192,7 +198,7 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
                 .setResizable(true)
                 .setAutoWidth(true);
         grid.addColumn(GbageDto::getAccountCode)
-                .setHeader("Numero cuenta")
+                .setHeader("Número cuenta")
                 .setFlexGrow(0)
                 .setSortable(true)
                 .setResizable(true)
@@ -205,9 +211,28 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
                 .setAutoWidth(true);
         grid.addColumn(new ComponentRenderer<>(this::createForm))
                 .setFlexGrow(0).setAutoWidth(true);
+        grid.addColumn(new ComponentRenderer<>(this::createSelectReport))
+                        .setFlexGrow(0).setAutoWidth(true);
         grid.addColumn(new ComponentRenderer<>(this::createDownloadLink))
                 .setFlexGrow(0).setAutoWidth(true);
         return grid;
+    }
+
+    private Component createSelectReport(GbageDto gbageDto){
+        Div content = new Div();
+
+        Button btnSelectReports = new Button();
+        btnSelectReports.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
+        btnSelectReports.setIcon(VaadinIcon.LIST_OL.create());
+        Tooltips.getCurrent().setTooltip(btnSelectReports,"Seleccionar reportes a imprimir");
+
+        btnSelectReports.addClickListener(event -> {
+            List<FormToSelectReportDto> formToSelectReportDtoList = formsRestTemplate.findFormSelectReportByIdclient(gbageDto.getGbagecage());
+            dialogFormToSelectReport = new DialogFormToSelectReport(formToSelectReportDtoList,formsRestTemplate);
+            dialogFormToSelectReport.open();
+        });
+
+        return btnSelectReports;
     }
 
     private Component createDownloadLink(GbageDto gbageDto){
@@ -400,7 +425,8 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
         }
 
         if(categoryTypeForm.equals("CAJA-AHORRO") || categoryTypeForm.equals("DPF")) {
-            DataFormDto dataFormDto = formsRestTemplate.findDataFormDtoFormSavingBoxByCageAndAccount(cage, accountCode,categoryTypeForm,isTutor);
+            DataFormDto dataFormDto = formsRestTemplate.findDataFormDtoFormSavingBoxByCageAndAccount(cage,
+                    accountCode,categoryTypeForm,isTutor);
             dialogFormSavingBank = new DialogFormSavingBank(accountCode, categoryTypeForm, nameTypeForm,
                     dataFormDto, formsRestTemplate, gbageLabDtoRestTemplate, gbconRestTemplate);
             dialogFormSavingBank.open();

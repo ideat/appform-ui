@@ -1,6 +1,7 @@
 package com.mindware.backend.rest.forms;
 
 import com.mindware.backend.entity.Forms;
+import com.mindware.backend.entity.dto.FormToSelectReportDto;
 import com.mindware.backend.entity.netbank.dto.DataFormDto;
 import com.mindware.backend.util.HeaderJwt;
 import com.vaadin.flow.server.VaadinSession;
@@ -13,7 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class FormsRestTemplate {
@@ -117,6 +120,16 @@ public class FormsRestTemplate {
 
         return response.getBody();
 
+    }
+
+    public List<FormToSelectReportDto> findFormSelectReportByIdclient(Integer idclient){
+        final String uri = url+"/formtoselectreport/findByIdClient/{idclient}";
+        Map<String,Integer> params = new HashMap<>();
+        params.put("idclient",idclient);
+
+        HttpEntity<FormToSelectReportDto> entity = new HttpEntity<>(HeaderJwt.getHeader());
+        ResponseEntity<FormToSelectReportDto[]> response = restTemplate.exchange(uri, HttpMethod.GET,entity,FormToSelectReportDto[].class,params);
+        return Arrays.asList(response.getBody());
     }
 
     public byte[] report(Integer codeClient, String idAccount, String typeForm, String categoryTypeForm, String isTutor){

@@ -10,6 +10,7 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -419,6 +420,22 @@ public class UIUtils {
 
 	public static void showNotification(String text) {
 		Notification.show(text, 3000, Notification.Position.BOTTOM_CENTER);
+	}
+
+	public static void showNotificationType(String text, String type){
+		Notification notification = Notification.show(text, 6000, Notification.Position.TOP_CENTER);
+		switch (type){
+			case "success":
+				notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+				break;
+			case "alert":
+				notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+				break;
+			case "info":
+				notification.addThemeVariants(NotificationVariant.LUMO_CONTRAST);
+				break;
+			default: notification.addThemeVariants(NotificationVariant.LUMO_CONTRAST);
+		}
 	}
 
 	public static Dialog dialog(String text, String type){

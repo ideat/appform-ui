@@ -46,7 +46,10 @@
     "@webcomponents/webcomponentsjs": "^2.2.10",
     "construct-style-sheets-polyfill": "2.4.16",
     "lit-element": "2.5.1",
-    "lit-html": "1.4.1"
+    "lit-html": "1.4.1",
+    "multiselect-combo-box": "2.4.2",
+    "retry": "0.12.0",
+    "tippy.js": "6.3.1"
   },
   "devDependencies": {
     "chokidar": "^3.5.0",
@@ -117,7 +120,10 @@
       "@webcomponents/webcomponentsjs": "^2.2.10",
       "construct-style-sheets-polyfill": "2.4.16",
       "lit-element": "2.5.1",
-      "lit-html": "1.4.1"
+      "lit-html": "1.4.1",
+      "multiselect-combo-box": "2.4.2",
+      "retry": "0.12.0",
+      "tippy.js": "6.3.1"
     },
     "devDependencies": {
       "chokidar": "^3.5.0",
@@ -138,6 +144,6 @@
       "webpack-dev-server": "3.11.0",
       "webpack-merge": "4.2.2"
     },
-    "hash": "7bd765b2e9b806557957f4f27fc3fb76c53f01f0577eb88d5a5f531e91d2bb8c"
+    "hash": "7d53c900ad09d76c9cf23c55533498609bf6db260d13524f2fdec0c5c2f62f31"
   }
 }

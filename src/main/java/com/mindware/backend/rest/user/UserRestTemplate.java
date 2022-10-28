@@ -59,6 +59,16 @@ public class UserRestTemplate {
         return response.getBody();
     }
 
+    public Users findByAdUser(String adUser){
+        final String uri = url+"/user/findByAdUser/{aduser}";
+        Map<String,String> params = new HashMap<>();
+        params.put("aduser",adUser);
+        HttpEntity<Users> entity = new HttpEntity<>(HeaderJwt.getHeader());
+        ResponseEntity<Users> response = restTemplate.exchange(uri, HttpMethod.GET,entity,Users.class,params);
+
+        return response.getBody();
+    }
+
     public List<Users> findByRol(String rol){
         final String uri = url+"/user/findByRol/{rol}";
         Map<String,String> params = new HashMap<>();
