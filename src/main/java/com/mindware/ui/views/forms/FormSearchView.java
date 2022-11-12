@@ -117,6 +117,12 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
 
         Button btnSearch = new Button("Buscar", new Icon(VaadinIcon.SEARCH));
 
+        Button btnSelectReports = new Button("Grupo Reportes");
+        btnSelectReports.setEnabled(false);
+        btnSelectReports.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
+        btnSelectReports.setIcon(VaadinIcon.LIST_OL.create());
+        Tooltips.getCurrent().setTooltip(btnSelectReports,"Seleccionar reportes a imprimir");
+
         btnSearch.addClickListener(click -> {
             if (radioSearch.getValue().equals("Carnet")){
                 gbageDtoList = gbageDtoRestTemplate.findGbageDto("cardnumber",textToSearch.getValue()+'%');
@@ -124,6 +130,11 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
             }else{
                 gbageDtoList = gbageDtoRestTemplate.findGbageDto("cage",textToSearch.getValue());
 
+            }
+            if(gbageDtoList.size()>0){
+                btnSelectReports.setEnabled(true);
+            }else{
+                btnSelectReports.setEnabled(false);
             }
             setViewContent(createContent());
         });
@@ -135,7 +146,14 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
 //        UI.getCurrent().addShortcutListener(
 //                () -> btnSearch.click(), Key.ENTER);
 
-        panelSearch.add(radioSearch, textToSearch, btnSearch);
+
+        btnSelectReports.addClickListener(event -> {
+            List<FormToSelectReportDto> formToSelectReportDtoList = formsRestTemplate.findFormSelectReportByIdclient(gbageDtoList.get(0).getGbagecage());
+            dialogFormToSelectReport = new DialogFormToSelectReport(formToSelectReportDtoList,formsRestTemplate);
+            dialogFormToSelectReport.open();
+        });
+
+        panelSearch.add(radioSearch, textToSearch, btnSearch, btnSelectReports);
         panelSearch.setSpacing(true);
         panelSearch.setAlignItems(FlexComponent.Alignment.START);
         panelSearch.setPadding(true);
@@ -211,29 +229,13 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
                 .setAutoWidth(true);
         grid.addColumn(new ComponentRenderer<>(this::createForm))
                 .setFlexGrow(0).setAutoWidth(true);
-        grid.addColumn(new ComponentRenderer<>(this::createSelectReport))
-                        .setFlexGrow(0).setAutoWidth(true);
+//        grid.addColumn(new ComponentRenderer<>(this::createSelectReport))
+//                        .setFlexGrow(0).setAutoWidth(true);
         grid.addColumn(new ComponentRenderer<>(this::createDownloadLink))
                 .setFlexGrow(0).setAutoWidth(true);
         return grid;
     }
 
-    private Component createSelectReport(GbageDto gbageDto){
-        Div content = new Div();
-
-        Button btnSelectReports = new Button();
-        btnSelectReports.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
-        btnSelectReports.setIcon(VaadinIcon.LIST_OL.create());
-        Tooltips.getCurrent().setTooltip(btnSelectReports,"Seleccionar reportes a imprimir");
-
-        btnSelectReports.addClickListener(event -> {
-            List<FormToSelectReportDto> formToSelectReportDtoList = formsRestTemplate.findFormSelectReportByIdclient(gbageDto.getGbagecage());
-            dialogFormToSelectReport = new DialogFormToSelectReport(formToSelectReportDtoList,formsRestTemplate);
-            dialogFormToSelectReport.open();
-        });
-
-        return btnSelectReports;
-    }
 
     private Component createDownloadLink(GbageDto gbageDto){
         Div content = new Div();
@@ -337,20 +339,24 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
                            int years = getYears(gbageDto);
                            if(years < 18){
                                report = new FormReportView(gbageDto.getSecundaryCage(), gbageDto.getAccountCode(),
-                                       taskSelect.getValue(), gbageDto.getAccountName(), formsRestTemplate, "", "", contractRestTemplate, "SI","SI");
+                                       taskSelect.getValue(), gbageDto.getAccountName(),
+                                       formsRestTemplate, "", "", contractRestTemplate, "SI","SI");
                            }else{
                                if(gbageDto.getSecundaryCage().equals(gbageDto.getGbagecage())) {
                                    report = new FormReportView(gbageDto.getGbagecage(), gbageDto.getAccountCode(),
-                                           taskSelect.getValue(), gbageDto.getAccountName(), formsRestTemplate, "", "", contractRestTemplate, "NO","NO");
+                                           taskSelect.getValue(), gbageDto.getAccountName(),
+                                           formsRestTemplate, "", "", contractRestTemplate, "NO","NO");
                                }else{
                                    report = new FormReportView(gbageDto.getSecundaryCage(), gbageDto.getAccountCode(),
-                                           taskSelect.getValue(), gbageDto.getAccountName(), formsRestTemplate, "", "", contractRestTemplate, "SI","NO");
+                                           taskSelect.getValue(), gbageDto.getAccountName(),
+                                           formsRestTemplate, "", "", contractRestTemplate, "SI","NO");
                                }
                            }
 
                        }else{
                            report = new FormReportView(gbageDto.getGbagecage(), gbageDto.getAccountCode(),
-                                   taskSelect.getValue(), gbageDto.getAccountName(), formsRestTemplate, "", "",contractRestTemplate,"NO","NO");
+                                   taskSelect.getValue(), gbageDto.getAccountName(),
+                                   formsRestTemplate, "", "",contractRestTemplate,"NO","NO");
                        }
                        report.open();
                    } catch (Exception e) {

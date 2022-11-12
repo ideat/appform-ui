@@ -33,6 +33,7 @@ import com.vaadin.flow.data.renderer.LocalDateRenderer;
 import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.theme.lumo.Lumo;
 
+import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -265,6 +266,12 @@ public class DialogDigitalBanking extends Dialog {
                         accountServiceOperation.setReasonOpening(dialogServiceOperationDigitalBank.textArea.getValue());
                         Date currentDate = (Date) VaadinSession.getCurrent().getAttribute("current-date");
                         accountServiceOperation.setCreateDate(Util.formatDate(currentDate, "dd/MM/yyyy"));
+
+                        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
+                        Date dateHour = new Date();
+                        String hour = formatter.format(dateHour);
+                        accountServiceOperation.setHourCreate(hour);
+
                         accountServiceOperation.setOriginModule("AUTOFORM");
                         accountServiceOperationList.add(accountServiceOperation);
                         dialogServiceOperationDigitalBank.close();
@@ -435,6 +442,14 @@ public class DialogDigitalBanking extends Dialog {
                             formsDigitalBank.setAccountServiceOperation(op);
                             if(formsDigitalBank.getIdUser()==null || formsDigitalBank.getIdUser().equals("")){
                                 formsDigitalBank.setIdUser(VaadinSession.getCurrent().getAttribute("login").toString());
+
+                                Date currentDate = (Date) VaadinSession.getCurrent().getAttribute("current-date");
+
+                                SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
+                                Date dateHour = new Date();
+                                String hour = formatter.format(dateHour);
+                                formsDigitalBank.setCreationDate(currentDate);
+                                formsDigitalBank.setCreationTime(hour);
                             }
                             formsRestTemplateGlobal.create(formsDigitalBank);
                             dialogServiceOperationDigitalBank.close();

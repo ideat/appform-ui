@@ -26,9 +26,12 @@ import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
+import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.theme.lumo.Lumo;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -376,10 +379,19 @@ public class DialogFormSavingBank extends Dialog {
         //Save changes
         btnSave.addClickListener(event -> {
            if(binder.writeBeanIfValid(forms)){
+               Date currentDate = (Date) VaadinSession.getCurrent().getAttribute("current-date");
+
+               SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
+               Date dateHour = new Date();
+               String hour = formatter.format(dateHour);
+
+               forms.setCreationTime(hour);
+               forms.setCreationDate(currentDate);
                forms.setNameTypeForm(nameTypeForm);
                forms.setCategoryTypeForm(categoryTypeForm);
                forms.setIdAccount(accountCode);
                forms.setIdClient(dataFormDto.getCodeClient());
+               forms.setIdUser(VaadinSession.getCurrent().getAttribute("login").toString());
                formsRestTemplateGlobal.create(forms);
                UIUtils.dialog("Datos formulario registrados","success").open();
                close();

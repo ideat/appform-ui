@@ -211,5 +211,20 @@ public class FormsRestTemplate {
         return response.getBody();
     }
 
+    public byte[] reportSelectedReports(Integer codClient, String login, String listReports, String officeName){
+        final String uri = url + "/form/getSelectedReport";
+
+        HttpHeaders headers = HeaderJwt.getHeader();
+        headers.add("code_client", codClient.toString());
+        headers.add("login",login);
+        headers.add("office_name", officeName);
+        headers.add("list_reports",listReports);
+        HttpEntity<byte[]> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<byte[]> response = restTemplate.exchange(uri,HttpMethod.GET,entity,byte[].class);
+
+        return response.getBody();
+
+    }
 
 }

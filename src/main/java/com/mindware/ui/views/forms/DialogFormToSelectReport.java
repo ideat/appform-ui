@@ -3,7 +3,10 @@ package com.mindware.ui.views.forms;
 import com.mindware.backend.entity.Forms;
 import com.mindware.backend.entity.dto.FormToSelectReportDto;
 import com.mindware.backend.entity.netbank.dto.DataFormDto;
+import com.mindware.backend.entity.netbank.dto.GbageDto;
 import com.mindware.backend.rest.forms.FormsRestTemplate;
+import com.mindware.backend.rest.netbank.GbageDtoRestTemplate;
+import com.mindware.ui.util.UIUtils;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.CssImport;
@@ -19,10 +22,12 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.theme.lumo.Lumo;
 import org.vaadin.gatanaso.MultiselectComboBox;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @CssImport("./styles/my-dialog.css")
 public class DialogFormToSelectReport extends Dialog {
@@ -44,7 +49,8 @@ public class DialogFormToSelectReport extends Dialog {
 
     private FormsRestTemplate formsRestTemplateGlobal;
 
-    public DialogFormToSelectReport(List<FormToSelectReportDto> formToSelectReportDtoList, FormsRestTemplate formsRestTemplate){
+    public DialogFormToSelectReport(List<FormToSelectReportDto> formToSelectReportDtoList,
+                                    FormsRestTemplate formsRestTemplate){
         setDraggable(true);
         setModal(false);
         setResizable(true);
@@ -115,19 +121,38 @@ public class DialogFormToSelectReport extends Dialog {
 
         multiselectComboBox.setRenderer(new ComponentRenderer<VerticalLayout,FormToSelectReportDto>(VerticalLayout::new,(container, formToSelectReportDto) -> {
             HorizontalLayout typeForm = new HorizontalLayout(new Icon(VaadinIcon.NEWSPAPER),
-                    new Label(formToSelectReportDto.getNameTypeForm()+"-"+ formToSelectReportDto.getCategoryTypeForm()));
+                    new Label(formToSelectReportDto.getNameTypeForm()+"*"+ formToSelectReportDto.getCategoryTypeForm()));
             HorizontalLayout client = new HorizontalLayout(new Icon(VaadinIcon.CLIPBOARD_USER),
                     new Label("Código Cliente: " + formToSelectReportDto.getIdClient()));
+
             HorizontalLayout account = new HorizontalLayout(new Icon(VaadinIcon.BOOK_DOLLAR),
-                    new Label("Cuenta: " + formToSelectReportDto.getIdAccount()));
-            container.add(typeForm,client,account);
+                    new Label("Cuenta: " +
+                            (formToSelectReportDto.getNameTypeForm()
+                                    .equals("FORMULARIO APERTURA")?formToSelectReportDto.getIdAccount():formToSelectReportDto.getAccount())));
+
+            HorizontalLayout idaccount = new HorizontalLayout(new Icon(VaadinIcon.BOOK_DOLLAR),
+                    new Label("ID: " + formToSelectReportDto.getIdAccount()));
+            idaccount.setVisible(false);
+            container.add(typeForm,client,account,idaccount);
         }));
 
-        multiselectComboBox.setItemLabelGenerator(FormToSelectReportDto::getNameTypeForm );
+        multiselectComboBox.setItemLabelGenerator(FormToSelectReportDto::getTypFormAccount );
 
         Button btnPrint = new Button("Imprimir");
         btnPrint.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         btnPrint.addClickListener(event -> {
+            String list = multiselectComboBox.getSelectedItems()
+                    .stream()
+                    .map(FormToSelectReportDto::getTypFormAccount)
+                    .collect(Collectors.joining("&","",""));
+
+
+            UIUtils.showNotificationType(list,"info");
+
+            FormReportView report = new FormReportView(formToSelectReportDtoList.get(0).getIdClient(),
+                    VaadinSession.getCurrent().getAttribute("name-office").toString(),"REPORTS","SELECTED",formsRestTemplateGlobal,list,
+                    VaadinSession.getCurrent().getAttribute("login").toString(),null,"","");
+            report.open();
 
         });
 

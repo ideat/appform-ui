@@ -75,7 +75,14 @@ public class FormReportView extends Dialog  {
         header.getElement().getThemeList().add(Lumo.DARK);
         add(header);
 
+        if(categoryTypeForm.equals("SELECTED")){
 
+            try{
+                file = restTemplate.reportSelectedReports(codeClient,login,others,idAccount);
+            }catch (Exception e){
+                UIUtils.dialog("Error:" + e.getMessage(), "alert").open();
+            }
+        }else
         if(categoryTypeForm.equals("CAJA-AHORRO") || categoryTypeForm.equals("DPF")){
             if(typeForm.equals("FORMULARIO APERTURA")) {
                 try {
