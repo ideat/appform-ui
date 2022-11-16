@@ -10,6 +10,7 @@ import com.mindware.backend.rest.netbank.GbageDtoRestTemplate;
 import com.mindware.backend.rest.netbank.GbageLabDtoRestTemplate;
 import com.mindware.backend.rest.netbank.GbconRestTemplate;
 import com.mindware.backend.rest.parameter.ParameterRestTemplate;
+import com.mindware.backend.rest.signatory.SignatoryRestTemplate;
 import com.mindware.ui.MainLayout;
 import com.mindware.ui.components.FlexBoxLayout;
 import com.mindware.ui.layout.size.Horizontal;
@@ -76,6 +77,9 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
     private GbconRestTemplate gbconRestTemplate;
 
     @Autowired
+    private SignatoryRestTemplate signatoryRestTemplate;
+
+    @Autowired
     private ContractRestTemplate contractRestTemplate;
 
     private List<GbageDto> gbageDtoList = new ArrayList<>();
@@ -85,6 +89,8 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
     private DialogServiceDebitCard dialogServiceDebitCard;
 
     private DialogFormToSelectReport dialogFormToSelectReport;
+
+    private DialogGenerateContract dialogGenerateContract;
 
     @Override
     protected void onAttach(AttachEvent attachment){
@@ -340,23 +346,23 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
                            if(years < 18){
                                report = new FormReportView(gbageDto.getSecundaryCage(), gbageDto.getAccountCode(),
                                        taskSelect.getValue(), gbageDto.getAccountName(),
-                                       formsRestTemplate, "", "", contractRestTemplate, "SI","SI");
+                                       formsRestTemplate, "", "","", contractRestTemplate, "SI","SI");
                            }else{
                                if(gbageDto.getSecundaryCage().equals(gbageDto.getGbagecage())) {
                                    report = new FormReportView(gbageDto.getGbagecage(), gbageDto.getAccountCode(),
                                            taskSelect.getValue(), gbageDto.getAccountName(),
-                                           formsRestTemplate, "", "", contractRestTemplate, "NO","NO");
+                                           formsRestTemplate, "", "","", contractRestTemplate, "NO","NO");
                                }else{
                                    report = new FormReportView(gbageDto.getSecundaryCage(), gbageDto.getAccountCode(),
                                            taskSelect.getValue(), gbageDto.getAccountName(),
-                                           formsRestTemplate, "", "", contractRestTemplate, "SI","NO");
+                                           formsRestTemplate, "", "", "",contractRestTemplate, "SI","NO");
                                }
                            }
 
                        }else{
                            report = new FormReportView(gbageDto.getGbagecage(), gbageDto.getAccountCode(),
                                    taskSelect.getValue(), gbageDto.getAccountName(),
-                                   formsRestTemplate, "", "",contractRestTemplate,"NO","NO");
+                                   formsRestTemplate, "", "","",contractRestTemplate,"NO","NO");
                        }
                        report.open();
                    } catch (Exception e) {
@@ -364,25 +370,31 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
                    }
                }else if(taskSelect.getValue().equals("CONTRATO")){
                    FormReportView report = null;
-                   String login = VaadinSession.getCurrent().getAttribute("login").toString();
-                   try {
-                       if(gbageDto.getAccountName().equals("CAJA-AHORRO")) {
-                           int years = getYears(gbageDto);
-                           if(years < 18){
-                               report = new FormReportView(gbageDto.getSecundaryCage(), gbageDto.getAccountCode(),
-                                       taskSelect.getValue(), gbageDto.getAccountName(), formsRestTemplate, gbageDto.getTypeAccount().trim(), login, contractRestTemplate, "SI","SI");
-                           }else{
-                               report = new FormReportView(gbageDto.getGbagecage(), gbageDto.getAccountCode(),
-                                       taskSelect.getValue(), gbageDto.getAccountName(), formsRestTemplate, gbageDto.getTypeAccount().trim(), login, contractRestTemplate, "NO","NO");
-                           }
-                       }else {
-                           report = new FormReportView(gbageDto.getGbagecage(), gbageDto.getAccountCode(),
-                                   taskSelect.getValue(), gbageDto.getAccountName(), formsRestTemplate, "", login, contractRestTemplate, "NO","NO");
-                       }
-                       report.open();
-                   }catch (Exception e){
-
-                   }
+//                   String login = VaadinSession.getCurrent().getAttribute("login").toString();
+//                   try {
+//                       if(gbageDto.getAccountName().equals("CAJA-AHORRO")) {
+////                           int years = getYears(gbageDto);
+////                           if(years < 18){
+////                               report = new FormReportView(gbageDto.getSecundaryCage(), gbageDto.getAccountCode(),
+////                                       taskSelect.getValue(), gbageDto.getAccountName(), formsRestTemplate,
+////                                       gbageDto.getTypeAccount().trim(), login, contractRestTemplate, "SI","SI");
+////                           }else{
+////                               report = new FormReportView(gbageDto.getGbagecage(), gbageDto.getAccountCode(),
+////                                       taskSelect.getValue(), gbageDto.getAccountName(), formsRestTemplate,
+////                                       gbageDto.getTypeAccount().trim(), login, contractRestTemplate, "NO","NO");
+////                           }
+//
+//                       }else {
+//                           report = new FormReportView(gbageDto.getGbagecage(), gbageDto.getAccountCode(),
+//                                   taskSelect.getValue(), gbageDto.getAccountName(),
+//                                   formsRestTemplate, "", login, contractRestTemplate, "NO","NO");
+//                       }
+////                       report.open();
+//                   }catch (Exception e){
+//
+//                   }
+                   dialogGenerateContract = new DialogGenerateContract(signatoryRestTemplate.findAll(),contractRestTemplate,gbageDto,formsRestTemplate);
+                   dialogGenerateContract.open();
                }
 
            }else{

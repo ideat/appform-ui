@@ -44,7 +44,7 @@ public class FormReportView extends Dialog  {
 
     public FormReportView(Integer codeClient, String idAccount, String typeForm,
                           String categoryTypeForm, FormsRestTemplate restTemplate,
-                          String others, String login, ContractRestTemplate contractRestTemplate,
+                          String others, String plaza, String login, ContractRestTemplate contractRestTemplate,
                           String isTutor, String isYunger){
         setDraggable(true);
         setModal(false);
@@ -94,7 +94,7 @@ public class FormReportView extends Dialog  {
             }else{
                 try {
                     file = contractRestTemplate.contract(codeClient, idAccount, typeForm, categoryTypeForm,isTutor,
-                            others, isYunger);
+                            others, plaza, isYunger);
                 }catch (Exception e){
                     UIUtils.dialog("Error:" + e.getMessage(), "alert").open();
 

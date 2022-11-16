@@ -28,4 +28,9 @@ public class Signatory {
     private String tradeRegistration;
 
     private String active;
+
+    @Override
+    public String toString(){
+        return fullName +"-" + plaza;
+    }
 }
