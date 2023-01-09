@@ -35,10 +35,12 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.converter.LocalDateToDateConverter;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.ParentLayout;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLayout;
+import dev.mett.vaadin.tooltip.Tooltips;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
@@ -118,8 +120,8 @@ public class SignatoryView extends SplitViewFrame implements RouterLayout {
         grid.setWidthFull();
 
         grid.setDataProvider(dataProvider);
-        grid.addSelectionListener(event -> event.getFirstSelectedItem()
-                .ifPresent(this::showDetails));
+//        grid.addSelectionListener(event -> event.getFirstSelectedItem()
+//                .ifPresent(this::showDetails));
 
         grid.addColumn(Signatory::getFullName)
                 .setFlexGrow(0)
@@ -139,8 +141,23 @@ public class SignatoryView extends SplitViewFrame implements RouterLayout {
                 .setSortable(true)
                 .setResizable(true)
                 .setAutoWidth(true);
+        grid.addColumn(new ComponentRenderer<>(this::createEditButton))
+                .setFlexGrow(0)
+                .setAutoWidth(true);
 
         return grid;
+    }
+
+    private Component createEditButton(Signatory signatory){
+        Button button = new Button();
+        button.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
+        button.setIcon(VaadinIcon.EDIT.create());
+        Tooltips.getCurrent().setTooltip(button,"Editar");
+        button.addClickListener(event ->{
+            showDetails(signatory);
+        });
+
+        return button;
     }
 
     private DetailsDrawer createDetailsDrawer(){

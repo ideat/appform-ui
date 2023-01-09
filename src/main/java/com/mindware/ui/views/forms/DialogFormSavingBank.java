@@ -105,7 +105,7 @@ public class DialogFormSavingBank extends Dialog {
         btnSave = new Button("Guardar");
         discardDraft = new Button(VaadinIcon.TRASH.create());
         // Content
-        forms = formsRestTemplateGlobal.findByIdAccountAndTypeFormAndCategoryTypeForm(accountCode,nameTypeForm,categoryTypeForm);
+        forms = formsRestTemplateGlobal.findByIdClientIdAccountAndTypeFormAndCategoryTypeForm(dataFormDto.getCodeClient().toString(), accountCode,nameTypeForm,categoryTypeForm);
         binderDataFormDto = new BeanValidationBinder(DataFormDto.class);
         binder = new BeanValidationBinder<>(Forms.class);
 

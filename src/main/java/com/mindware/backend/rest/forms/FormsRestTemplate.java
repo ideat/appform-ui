@@ -76,6 +76,22 @@ public class FormsRestTemplate {
 
     }
 
+    public Forms findByIdClientIdAccountAndTypeFormAndCategoryTypeForm(String idClient, String idAccount, String nameTypeForm, String categoryTypeForm ){
+        final String uri = url + "/form/findByIdClientIdAccountAndTypeFormAndCategoryTypeForm";
+
+        HttpHeaders headers = HeaderJwt.getHeader();
+        headers.add("id_client",idClient);
+        headers.add("id_account",idAccount);
+        headers.add("name_type_form",nameTypeForm);
+        headers.add("category_type_form",categoryTypeForm);
+        HttpEntity<Forms> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<Forms> response = restTemplate.exchange(uri,HttpMethod.GET,entity,Forms.class);
+
+        return response.getBody();
+
+    }
+
     public List<Forms> findByUserTypeFormAndCategoryTypeForm(String idUser, String nameTypeForm, String categoryTypeForm ){
         final String uri = url + "/form/findByUserTypeFormAndCategoryTypeForm";
 

@@ -29,6 +29,7 @@ import java.time.Period;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 public class DialogGenerateContract extends Dialog {
 
@@ -52,7 +53,9 @@ public class DialogGenerateContract extends Dialog {
         setDraggable(true);
         setModal(false);
         setResizable(true);
-
+        signatoryList = signatoryList.stream()
+                        .filter(f -> f.getActive().equals("SI"))
+                        .collect(Collectors.toList());
         // Dialog theming
         getElement().getThemeList().add("my-dialog");
         setWidth("800px");
@@ -105,7 +108,7 @@ public class DialogGenerateContract extends Dialog {
 
         HorizontalLayout horizontalLayout = new HorizontalLayout();
         signatoryLookupField = new LookupField<>(Signatory.class);
-        signatoryLookupField.setWidthFull();
+        signatoryLookupField.setWidth("350px");
         signatoryLookupField.setItems(signatoryList);
         signatoryLookupField.setI18n(new AbstractLookupField.LookupFieldI18n()
                 .setSearcharialabel("Click para buscar")
@@ -122,42 +125,46 @@ public class DialogGenerateContract extends Dialog {
 
         signatoryLookupField.addThemeVariants(EnhancedDialogVariant.SIZE_MEDIUM);
 
-        dateContract = new DatePicker("Fecha contrato");
-        dateContract.setWidthFull();
-        dateContract.setLocale(new Locale("es","BO"));
-        dateContract.setI18n(UIUtils.spanish());
+//        dateContract = new DatePicker("Fecha contrato");
+//        dateContract.setWidthFull();
+//        dateContract.setLocale(new Locale("es","BO"));
+//        dateContract.setI18n(UIUtils.spanish());
 
         btnGenerateContract = new Button("Generar");
         btnGenerateContract.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         btnGenerateContract.addClickListener(event -> {
-            FormReportView report = null;
-            String login = VaadinSession.getCurrent().getAttribute("login").toString();
-            try {
-                if(gbageDto.getAccountName().equals("CAJA-AHORRO")) {
-                           int years = getYears(gbageDto);
-                           if(years < 18){
-                               report = new FormReportView(gbageDto.getSecundaryCage(), gbageDto.getAccountCode(),
-                                       "CONTRATO", gbageDto.getAccountName(), formsRestTemplate,
-                                       gbageDto.getTypeAccount().trim(), signatoryLookupField.getValue().getPlaza().toString(), login, contractRestTemplate, "SI","SI");
-                           }else{
-                               report = new FormReportView(gbageDto.getGbagecage(), gbageDto.getAccountCode(),
-                                       "CONTRATO", gbageDto.getAccountName(), formsRestTemplate,
-                                       gbageDto.getTypeAccount().trim(), signatoryLookupField.getValue().getPlaza().toString(), login, contractRestTemplate, "NO","NO");
-                           }
+            if (signatoryLookupField.getValue()!=null) {
+                FormReportView report = null;
+                String login = VaadinSession.getCurrent().getAttribute("login").toString();
+                try {
+                    if (gbageDto.getAccountName().equals("CAJA-AHORRO")) {
+                        int years = getYears(gbageDto);
+                        if (years < 18) {
+                            report = new FormReportView(gbageDto.getSecundaryCage(), gbageDto.getAccountCode(),
+                                    "CONTRATO", gbageDto.getAccountName(), formsRestTemplate,
+                                    gbageDto.getTypeAccount().trim(), signatoryLookupField.getValue().getPlaza().toString(), login, contractRestTemplate, "SI", "SI");
+                        } else {
+                            report = new FormReportView(gbageDto.getGbagecage(), gbageDto.getAccountCode(),
+                                    "CONTRATO", gbageDto.getAccountName(), formsRestTemplate,
+                                    gbageDto.getTypeAccount().trim(), signatoryLookupField.getValue().getPlaza().toString(), login, contractRestTemplate, "NO", "NO");
+                        }
 
-                }else {
-                    report = new FormReportView(gbageDto.getGbagecage(), gbageDto.getAccountCode(),
-                            "CONTRATO", gbageDto.getAccountName(),
-                            formsRestTemplate, "", signatoryLookupField.getValue().getPlaza().toString(),login, contractRestTemplate, "NO","NO");
+                    } else {
+                        report = new FormReportView(gbageDto.getGbagecage(), gbageDto.getAccountCode(),
+                                "CONTRATO", gbageDto.getAccountName(),
+                                formsRestTemplate, "", signatoryLookupField.getValue().getPlaza().toString(), login, contractRestTemplate, "NO", "NO");
+                    }
+                    report.open();
+                } catch (Exception e) {
+
                 }
-                report.open();
-            }catch (Exception e){
-
+            }else {
+                UIUtils.showNotificationType("Seleccione un representante legal","alert");
             }
         });
 
         horizontalLayout.add(signatoryLookupField);
-        horizontalLayout.add(dateContract);
+//        horizontalLayout.add(dateContract);
         horizontalLayout.add(btnGenerateContract);
         horizontalLayout.setVerticalComponentAlignment(FlexComponent.Alignment.END,btnGenerateContract);
 

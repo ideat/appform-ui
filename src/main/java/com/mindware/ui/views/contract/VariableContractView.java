@@ -93,14 +93,14 @@ public class VariableContractView extends SplitViewFrame implements RouterLayout
         btnNew.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         btnNew.setIcon(VaadinIcon.PLUS_CIRCLE.create());
         btnNew.addClickShortcut(Key.KEY_N, KeyModifier.ALT);
-//        btnNew.setEnabled(GrantOptions.grantedOption("Variables de Contratos"));
+//        btnNew.setEnabled(GrantOptions.grantedOption("ADMINISTRADOR"));
         btnNew.addClickListener(e -> {
             showDetails(new VariableContract());
         });
 
         HorizontalLayout topLayout = new HorizontalLayout();
         topLayout.setWidth("100%");
-//        topLayout.add(btnNew);
+        topLayout.add(btnNew);
         topLayout.setVerticalComponentAlignment(FlexComponent.Alignment.END,btnNew);
         topLayout.setSpacing(true);
         topLayout.setPadding(true);

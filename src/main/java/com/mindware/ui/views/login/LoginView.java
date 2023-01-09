@@ -110,7 +110,7 @@ public class LoginView extends VerticalLayout {
                     VaadinSession.getCurrent().setAttribute("rol",users.getRolName());
                     VaadinSession.getCurrent().setAttribute("email",users.getEmail());
                     VaadinSession.getCurrent().setAttribute("plaza",adusrOfi.getAdusrplaz());
-                    VaadinSession.getCurrent().setAttribute("version","1.0.4");
+                    VaadinSession.getCurrent().setAttribute("version","1.0.8");
                     UI.getCurrent().navigate("main");
                 }else{
                     DialogUpdatePassword dialogUpdatePassword = new DialogUpdatePassword(userRestTemplate,users);
@@ -142,12 +142,12 @@ public class LoginView extends VerticalLayout {
             Gbpmt gbpmt = gbpmtRestTemplate.findAll();
             VaadinSession.getCurrent().setAttribute("jwt", null);
 
-            if(users.getState().equals("ACTIVO")) {
+//            if(users.getState().equals("ACTIVO")) {
                 if(adusrOfi==null){
                     UIUtils.dialog("La cuenta de usuario no existe en el core financiero","alert").open();
                     return;
                 }
-                if(isCurrentPassword(users, gbpmt.getGbpmtfdia())==true){
+//                if(isCurrentPassword(users, gbpmt.getGbpmtfdia())==true){
                     VaadinSession.getCurrent().setAttribute("jwt", token.getToken());
                     VaadinSession.getCurrent().setAttribute("login",users.getLogin());
                     VaadinSession.getCurrent().setAttribute("type-change", gbpmt.getGbpmttcof());
@@ -156,17 +156,17 @@ public class LoginView extends VerticalLayout {
                     VaadinSession.getCurrent().setAttribute("rol",users.getRolName());
                     VaadinSession.getCurrent().setAttribute("email",users.getEmail());
                     VaadinSession.getCurrent().setAttribute("plaza",adusrOfi.getAdusrplaz());
-                    VaadinSession.getCurrent().setAttribute("version","1.0.3");
+                    VaadinSession.getCurrent().setAttribute("version","1.0.6");
                     UI.getCurrent().navigate("main");
-                }else{
-                    DialogUpdatePassword dialogUpdatePassword = new DialogUpdatePassword(userRestTemplate,users);
-                    dialogUpdatePassword.open();
-                }
+//                }else{
+//                    DialogUpdatePassword dialogUpdatePassword = new DialogUpdatePassword(userRestTemplate,users);
+//                    dialogUpdatePassword.open();
+//                }
 
-            }else if(users.getState().equals("RESET")){
-                DialogUpdatePassword dialogUpdatePassword = new DialogUpdatePassword(userRestTemplate,users);
-                dialogUpdatePassword.open();
-            }
+//            }else if(users.getState().equals("RESET")){
+//                DialogUpdatePassword dialogUpdatePassword = new DialogUpdatePassword(userRestTemplate,users);
+//                dialogUpdatePassword.open();
+//            }
         }catch (Exception ex){
             component.setError(true);
         }

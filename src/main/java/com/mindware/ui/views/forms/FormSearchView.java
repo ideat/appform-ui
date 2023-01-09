@@ -267,7 +267,6 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
                 content = new Div(downloadLink);
             }
 
-
         }
 
         return content;
