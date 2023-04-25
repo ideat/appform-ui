@@ -149,7 +149,7 @@ public class DialogFormToSelectReport extends Dialog {
 
                 FormReportView report = new FormReportView(formToSelectReportDtoList.get(0).getIdClient(),
                         VaadinSession.getCurrent().getAttribute("name-office").toString(), "REPORTS", "SELECTED", formsRestTemplateGlobal, list,
-                        VaadinSession.getCurrent().getAttribute("login").toString(), VaadinSession.getCurrent().getAttribute("login").toString(), null, "", "");
+                        VaadinSession.getCurrent().getAttribute("login").toString(), VaadinSession.getCurrent().getAttribute("login").toString(), null, "", "",0, null);
                 report.open();
             }else {
                 UIUtils.showNotificationType("Seleccione los reportes a imprimir","alert");

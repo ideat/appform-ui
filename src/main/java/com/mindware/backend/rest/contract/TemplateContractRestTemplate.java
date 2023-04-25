@@ -50,6 +50,18 @@ public class TemplateContractRestTemplate {
         return Arrays.asList(response.getBody());
     }
 
+    public List<TemplateContract> findByCategory(String category){
+        final String uri = url + "/template-contract/findByCateroy";
+
+        HttpHeaders headers = HeaderJwt.getHeader();
+        headers.add("category",category);
+
+        HttpEntity<TemplateContract[]> entity = new HttpEntity<>(HeaderJwt.getHeader());
+        ResponseEntity<TemplateContract[]> response = restTemplate.exchange(uri, HttpMethod.GET, entity, TemplateContract[].class);
+
+        return Arrays.asList(response.getBody());
+    }
+
     public String  upload( String pathFileTemp, String fileName) {
         final String uri = url + "/template-contract/upload";
         MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();

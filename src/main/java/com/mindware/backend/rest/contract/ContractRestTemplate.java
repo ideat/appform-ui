@@ -26,7 +26,7 @@ public class ContractRestTemplate {
     RestTemplate restTemplate = new RestTemplate();
 
     public byte[] contract(Integer codeClient, String account, String typeForm,
-                           String categoryTypeForm, String isTutor, String typeAccount, String plaza,String isYunger){
+                           String categoryTypeForm, String isTutor, String typeAccount, String plaza,String isYunger, String typeSavingBox){
         final String uri = url + "/contract/getFileContract";
 
         HttpHeaders headers = HeaderJwt.getHeader();
@@ -39,6 +39,7 @@ public class ContractRestTemplate {
         headers.add("plaza", plaza);
         headers.add("type-account", typeAccount);
         headers.add("is-yunger",isYunger);
+        headers.add("type-saving-box", typeSavingBox);
 
         HttpEntity<byte[]> entity = new HttpEntity<>(headers);
 

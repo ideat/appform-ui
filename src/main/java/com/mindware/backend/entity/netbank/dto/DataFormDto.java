@@ -78,4 +78,6 @@ public class DataFormDto {
     private String fullNameClient;
 
     private String account;
+
+    private Integer typeSavingBox;
 }

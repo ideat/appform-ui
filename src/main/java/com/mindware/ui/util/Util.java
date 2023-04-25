@@ -6,9 +6,7 @@ import com.vaadin.flow.data.converter.Converter;
 import lombok.SneakyThrows;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-import java.util.Random;
+import java.util.*;
 
 public class Util {
 
@@ -68,6 +66,27 @@ public class Util {
 
     }
 
+    public static  class SetToStringConverter implements Converter<Set<String>, String> {
+
+        @Override
+        public Result<String> convertToModel(Set<String> presentation, ValueContext valueContext) {
+            String joined = String.join(",",presentation);
+
+            return Result.ok(joined);
+        }
+
+        @Override
+        public Set<String> convertToPresentation(String model, ValueContext valueContext) {
+            Set<String> output = new HashSet<>();
+            if(model!=null) {
+                String[] list = model.split(",");
+                for(String s:list){
+                    output.add(s);
+                }
+            }
+            return output;
+        }
+    }
 
 
     public static String generateRandomPassword(){

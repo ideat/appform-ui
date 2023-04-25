@@ -2,6 +2,7 @@ package com.mindware.ui.views.forms;
 
 import com.mindware.backend.rest.contract.ContractRestTemplate;
 import com.mindware.backend.rest.forms.FormsRestTemplate;
+import com.mindware.backend.rest.proofReceiptDpf.ProofReceiptDpfTemplate;
 import com.mindware.ui.components.FlexBoxLayout;
 import com.mindware.ui.components.detailsdrawer.DetailsDrawer;
 import com.mindware.ui.layout.size.Horizontal;
@@ -45,7 +46,7 @@ public class FormReportView extends Dialog  {
     public FormReportView(Integer codeClient, String idAccount, String typeForm,
                           String categoryTypeForm, FormsRestTemplate restTemplate,
                           String others, String plaza, String login, ContractRestTemplate contractRestTemplate,
-                          String isTutor, String isYunger){
+                          String isTutor, String isYunger, Integer typeSavingBox, ProofReceiptDpfTemplate proofReceiptDpfTemplate){
         setDraggable(true);
         setModal(false);
         setResizable(true);
@@ -91,14 +92,17 @@ public class FormReportView extends Dialog  {
                     UIUtils.dialog("Error:" + e.getMessage(), "alert").open();
 
                 }
-            }else{
+            }else if(typeForm.equals("CONTRATO")) {
                 try {
                     file = contractRestTemplate.contract(codeClient, idAccount, typeForm, categoryTypeForm,isTutor,
-                            others, plaza, isYunger);
+                            others, plaza, isYunger, typeSavingBox.toString());
                 }catch (Exception e){
                     UIUtils.dialog("Error:" + e.getMessage(), "alert").open();
 
                 }
+            }else if(typeForm.equals("CONSTANCIA RECEPCION")) {
+
+                file = proofReceiptDpfTemplate.proofReceiptDpf(idAccount);
             }
         }else if(categoryTypeForm.equals("VARIOS") && typeForm.equals("BANCA DIGITAL")){
             file = restTemplate.reportDigitalBank(codeClient,idAccount,typeForm,categoryTypeForm);

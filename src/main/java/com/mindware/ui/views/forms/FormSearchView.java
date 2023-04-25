@@ -10,6 +10,7 @@ import com.mindware.backend.rest.netbank.GbageDtoRestTemplate;
 import com.mindware.backend.rest.netbank.GbageLabDtoRestTemplate;
 import com.mindware.backend.rest.netbank.GbconRestTemplate;
 import com.mindware.backend.rest.parameter.ParameterRestTemplate;
+import com.mindware.backend.rest.proofReceiptDpf.ProofReceiptDpfTemplate;
 import com.mindware.backend.rest.signatory.SignatoryRestTemplate;
 import com.mindware.ui.MainLayout;
 import com.mindware.ui.components.FlexBoxLayout;
@@ -81,6 +82,9 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
 
     @Autowired
     private ContractRestTemplate contractRestTemplate;
+
+    @Autowired
+    private ProofReceiptDpfTemplate proofReceiptDpfTemplate;
 
     private List<GbageDto> gbageDtoList = new ArrayList<>();
 
@@ -290,8 +294,12 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
             taskSelect.setItems("BANCA DIGITAL", "SERVICIOS TD" );
             taskSelect.setPlaceholder("Seleccionar Tarea");
             btnPrint.setVisible(false);
-        }else {
+        }else if(gbageDto.getAccountName().equals("CAJA-AHORRO")){
             taskSelect.setItems("FORMULARIO APERTURA", "CONTRATO");
+            taskSelect.setPlaceholder("Seleccione Tarea");
+            btnPrint.setVisible(true);
+        }else {
+            taskSelect.setItems("FORMULARIO APERTURA","CONSTANCIA RECEPCION", "CONTRATO");
             taskSelect.setPlaceholder("Seleccione Tarea");
             btnPrint.setVisible(true);
         }
@@ -325,7 +333,7 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
                             }
 
                         }
-                    }else if (gbageDto.getAccountName().equals("DPF") && !taskSelect.getValue().equals("CONTRATO")){
+                    }else if (gbageDto.getAccountName().equals("DPF") && !taskSelect.getValue().equals("CONTRATO") && !taskSelect.getValue().equals("CONSTANCIA RECEPCION")){
                         openDialog(gbageDto.getGbagecage(), gbageDto.getAccountCode(), gbageDto.getAccountName(), taskSelect.getValue(),"NO");
                     }
 
@@ -345,58 +353,48 @@ public class FormSearchView extends SplitViewFrame implements RouterLayout {
                            if(years < 18){
                                report = new FormReportView(gbageDto.getSecundaryCage(), gbageDto.getAccountCode(),
                                        taskSelect.getValue(), gbageDto.getAccountName(),
-                                       formsRestTemplate, "", "","", contractRestTemplate, "SI","SI");
+                                       formsRestTemplate, "", "","",
+                                       contractRestTemplate, "SI","SI", 0,proofReceiptDpfTemplate);
                            }else{
                                if(gbageDto.getSecundaryCage().equals(gbageDto.getGbagecage())) {
                                    report = new FormReportView(gbageDto.getGbagecage(), gbageDto.getAccountCode(),
                                            taskSelect.getValue(), gbageDto.getAccountName(),
-                                           formsRestTemplate, "", "","", contractRestTemplate, "NO","NO");
+                                           formsRestTemplate, "", "","",
+                                           contractRestTemplate, "NO","NO",0,proofReceiptDpfTemplate);
                                }else{
                                    report = new FormReportView(gbageDto.getSecundaryCage(), gbageDto.getAccountCode(),
                                            taskSelect.getValue(), gbageDto.getAccountName(),
-                                           formsRestTemplate, "", "", "",contractRestTemplate, "SI","NO");
+                                           formsRestTemplate, "", "", "",
+                                           contractRestTemplate, "SI","NO",0,proofReceiptDpfTemplate);
                                }
                            }
 
                        }else{
                            report = new FormReportView(gbageDto.getGbagecage(), gbageDto.getAccountCode(),
                                    taskSelect.getValue(), gbageDto.getAccountName(),
-                                   formsRestTemplate, "", "","",contractRestTemplate,"NO","NO");
+                                   formsRestTemplate, "", "","",
+                                   contractRestTemplate,"NO","NO",0,proofReceiptDpfTemplate);
                        }
                        report.open();
                    } catch (Exception e) {
 
                    }
                }else if(taskSelect.getValue().equals("CONTRATO")){
-                   FormReportView report = null;
-//                   String login = VaadinSession.getCurrent().getAttribute("login").toString();
-//                   try {
-//                       if(gbageDto.getAccountName().equals("CAJA-AHORRO")) {
-////                           int years = getYears(gbageDto);
-////                           if(years < 18){
-////                               report = new FormReportView(gbageDto.getSecundaryCage(), gbageDto.getAccountCode(),
-////                                       taskSelect.getValue(), gbageDto.getAccountName(), formsRestTemplate,
-////                                       gbageDto.getTypeAccount().trim(), login, contractRestTemplate, "SI","SI");
-////                           }else{
-////                               report = new FormReportView(gbageDto.getGbagecage(), gbageDto.getAccountCode(),
-////                                       taskSelect.getValue(), gbageDto.getAccountName(), formsRestTemplate,
-////                                       gbageDto.getTypeAccount().trim(), login, contractRestTemplate, "NO","NO");
-////                           }
-//
-//                       }else {
-//                           report = new FormReportView(gbageDto.getGbagecage(), gbageDto.getAccountCode(),
-//                                   taskSelect.getValue(), gbageDto.getAccountName(),
-//                                   formsRestTemplate, "", login, contractRestTemplate, "NO","NO");
-//                       }
-////                       report.open();
-//                   }catch (Exception e){
-//
-//                   }
+
                    dialogGenerateContract = new DialogGenerateContract(signatoryRestTemplate.findAll(),contractRestTemplate,gbageDto,formsRestTemplate);
                    dialogGenerateContract.open();
                }
+               else if(taskSelect.getValue().equals("CONSTANCIA RECEPCION")){
+                   FormReportView report = null;
+                   String login = VaadinSession.getCurrent().getAttribute("login").toString();
+                   report = new FormReportView(gbageDto.getGbagecage(), gbageDto.getAccountCode(),
+                           "CONSTANCIA RECEPCION", gbageDto.getAccountName(),
+                           formsRestTemplate, "", "", login,
+                           contractRestTemplate, "NO", "NO",0,proofReceiptDpfTemplate);
+                   report.open();
+               }
 
-           }else{
+           }  else{
                UIUtils.dialog("Seleccione una tarea","info").open();
                return;
            }

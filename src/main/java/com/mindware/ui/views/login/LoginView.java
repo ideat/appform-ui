@@ -110,7 +110,7 @@ public class LoginView extends VerticalLayout {
                     VaadinSession.getCurrent().setAttribute("rol",users.getRolName());
                     VaadinSession.getCurrent().setAttribute("email",users.getEmail());
                     VaadinSession.getCurrent().setAttribute("plaza",adusrOfi.getAdusrplaz());
-                    VaadinSession.getCurrent().setAttribute("version","1.0.8");
+                    VaadinSession.getCurrent().setAttribute("version","1.0.10");
                     UI.getCurrent().navigate("main");
                 }else{
                     DialogUpdatePassword dialogUpdatePassword = new DialogUpdatePassword(userRestTemplate,users);
@@ -156,7 +156,7 @@ public class LoginView extends VerticalLayout {
                     VaadinSession.getCurrent().setAttribute("rol",users.getRolName());
                     VaadinSession.getCurrent().setAttribute("email",users.getEmail());
                     VaadinSession.getCurrent().setAttribute("plaza",adusrOfi.getAdusrplaz());
-                    VaadinSession.getCurrent().setAttribute("version","1.0.6");
+                    VaadinSession.getCurrent().setAttribute("version","1.0.7");
                     UI.getCurrent().navigate("main");
 //                }else{
 //                    DialogUpdatePassword dialogUpdatePassword = new DialogUpdatePassword(userRestTemplate,users);

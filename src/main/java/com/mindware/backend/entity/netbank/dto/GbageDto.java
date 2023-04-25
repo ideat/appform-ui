@@ -31,6 +31,8 @@ public class GbageDto {
 
     private String typeAccount;
 
+    private Integer typeSavingBox;
+
     public LocalDate getGbagefregConvert(){
         return gbagefreg.toInstant()
                 .atZone(ZoneId.of("UTC"))

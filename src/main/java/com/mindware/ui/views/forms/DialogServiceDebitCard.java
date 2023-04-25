@@ -378,7 +378,7 @@ public class DialogServiceDebitCard extends Dialog {
 
         btnPrint.addClickListener(click -> {
             FormReportView report = new FormReportView(formsDebitCard.getIdClient(),accountServiceOperation.getId(),
-                    formsDebitCard.getNameTypeForm(),formsDebitCard.getCategoryTypeForm(),formsRestTemplateGlobal,"","","",null,"NO","NO");
+                    formsDebitCard.getNameTypeForm(),formsDebitCard.getCategoryTypeForm(),formsRestTemplateGlobal,"","","",null,"NO","NO",0, null);
             report.open();
         });
 
@@ -405,7 +405,7 @@ public class DialogServiceDebitCard extends Dialog {
                 return;
             }
             FormReportView report = new FormReportView(formsDebitCard.getIdClient(),accountServiceOperation.getId(),
-                    formsDebitCard.getNameTypeForm(),formsDebitCard.getCategoryTypeForm(),formsRestTemplateGlobal,"DELIVER","", "",null,"NO","NO");
+                    formsDebitCard.getNameTypeForm(),formsDebitCard.getCategoryTypeForm(),formsRestTemplateGlobal,"DELIVER","", "",null,"NO","NO",0, null);
             report.open();
 
         });

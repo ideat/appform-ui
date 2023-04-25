@@ -142,17 +142,20 @@ public class DialogGenerateContract extends Dialog {
                         if (years < 18) {
                             report = new FormReportView(gbageDto.getSecundaryCage(), gbageDto.getAccountCode(),
                                     "CONTRATO", gbageDto.getAccountName(), formsRestTemplate,
-                                    gbageDto.getTypeAccount().trim(), signatoryLookupField.getValue().getPlaza().toString(), login, contractRestTemplate, "SI", "SI");
+                                    gbageDto.getTypeAccount().trim(), signatoryLookupField.getValue().getPlaza().toString(), login,
+                                    contractRestTemplate, "SI", "SI", gbageDto.getTypeSavingBox(), null);
                         } else {
                             report = new FormReportView(gbageDto.getGbagecage(), gbageDto.getAccountCode(),
                                     "CONTRATO", gbageDto.getAccountName(), formsRestTemplate,
-                                    gbageDto.getTypeAccount().trim(), signatoryLookupField.getValue().getPlaza().toString(), login, contractRestTemplate, "NO", "NO");
+                                    gbageDto.getTypeAccount().trim(), signatoryLookupField.getValue().getPlaza().toString(), login,
+                                    contractRestTemplate, "NO", "NO", gbageDto.getTypeSavingBox(), null);
                         }
 
                     } else {
                         report = new FormReportView(gbageDto.getGbagecage(), gbageDto.getAccountCode(),
                                 "CONTRATO", gbageDto.getAccountName(),
-                                formsRestTemplate, "", signatoryLookupField.getValue().getPlaza().toString(), login, contractRestTemplate, "NO", "NO");
+                                formsRestTemplate, "", signatoryLookupField.getValue().getPlaza().toString(), login,
+                                contractRestTemplate, "NO", "NO", gbageDto.getTypeSavingBox(), null);
                     }
                     report.open();
                 } catch (Exception e) {
